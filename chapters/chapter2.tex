@@ -27,7 +27,7 @@ y_{k+1} = f(y_{k}) + u_{k} + \omega_{k+1},\ f(\dot)\in F(L)
 
 目前关于反馈机制及能力的研究主要针对离散时间控制系统，这与离散时间控制器的广泛应用这一大趋势不谋而合，并且一开始就考虑到了非参数不确定性，因而具有较好的理论高度和普适性。反馈机制及能力给出了对不确定性系统的认识，从理论上看，不是所有的未知系统都可以设计出稳定的自适应控制律\upcite{Ma2008}；用但是同时也留下了一个问题：如果系统属于自适应反馈控制可稳定的范围内，那么如何设计出合适的自适应反馈控制律使系统达到满意的性能？一般来说，不同的被控对象自然结构和参数都不同，但是否存在一种较为通用的模型可以刻画大部分面对的被控对象？可以类比经典控制理论，毕竟线性系统和微分方程这些通用工具在几十年的控制理论中起到了关键的作用。类似这样的问题促进了半参数模型的提出。
 
-\section{半参数模型的描述}
+\section{半参数系统的描述}
 \label{sect:2.2}
 虽然数字化控制器输出到被控对象的信号是离散时间，但是实际的过程是连续时间变化的。一般的离散时间非线性控制往往忽略了这一点，就导致这些研究侧重于理论和离散时间仿真分析。再次考虑下面的NARX系统
 \begin{equation}%
@@ -43,20 +43,48 @@ y_{k+1} = f(y_{K},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 \label{eq:semi-u}
 y_{k+1} = \theta^{T}\bm{\phi_{k}}+f(\phi_{k})+ u_{k}+\omega_{k+1}
 \end{equation}
-其中，$y_{k}$，$u_{k}$分别表示系统在$k$时刻的输出和输入，$\bm{\phi_{k}}$是回归向量；$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\omega_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\omega_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、向量集合、数值集合。下面分别对这三个量列举一些先验知识的例子。
+其中，$y_{k}$，$u_{k}$分别表示系统在$k$时刻的输出和输入，$\bm{\phi_{k}}$是回归向量。系统的输出$y_{k}$对应到实际的伺服电机系统中可能就是需要控制的电机转速或者位置等物理量，而$u_k$可能就是控制电流（或者控制力矩）等。$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\omega_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\omega_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、向量集合、数值集合。下面分别对这三个量列举一些先验知识的例子。
 
 记
 \begin{equation}%
 \label{eq:}
-\bm{\theta} = [\theta_{1},\ldots,\theta_{p}]
+\bm{\theta} = [\theta_{1},\ldots,\theta_{p}]^{T}
 \end{equation}
-对于未知参数向量$\bm{\theta}$，可能存在如下的先验知识：
-\begin{enumerate}
+未知参数向量$\bm{\theta}$具有很强的物理意义，例如对应到伺服电机系统中，$\bm{\theta}$中的某些分量可能就表示电机的力矩常数、电枢回路常数等。$\bm{\theta}$可能存在如下的某种先验知识：
+\begin{itemize}
 \item 除了向量的元素个数外，没有其他任何关于未知参数的信息如上下界等；
-\item $\bm{\theta}$各分量的上下界已知，即$\underline{\theta}_{n}\leq\theta_{n}\geq\overline{\theta}_{n}$，其中$\underline{\theta}_{n}$和$\overline{\theta}_{n}$为已知常数；
-\item 未知向量$\bm{\theta}$和标称向量$\bm{\theta}_{0}$之间的距离取值在一个范围内，即$\|\bm{\theta}-\bm{\theta}_{0}\|\leq r_{0}$，这里$r_{0}$是一个已知的常数。
-\end{enumerate}
+\item $\bm{\theta}$各分量的上下界已知，即$\underline{\theta}_{n}\leq\theta_{n}\leq\overline{\theta}_{n}$，其中$\underline{\theta}_{n}$和$\overline{\theta}_{n}$为已知常数向量；
+\item 未知参数向量$\bm{\theta}$和标称向量$\bm{\theta}_{0}$之间的距离取值在一个范围内，即$\|\bm{\theta}-\bm{\theta}_{0}\|\leq r_{0}$，这里$r_{0}$是一个已知的常数。
+\item 未知参数向量的取值有限可数，即$\bm{\theta}$属于某一个已知的集合，$\bm{\theta}\in\{\bm{\theta}_{1},\bm{\theta}_{2},\bm{\theta}_{3},\dots,\}$；
+\item $\dots$
+\end{itemize}
+
+同理，未知函数$f(\cdot)$在实际系统如电机物理系统中，对应可能就是难以建模的非线性摩擦力（力矩）等。$f(\cdot)$可能存在如下的某种先验知识：
+\begin{itemize}
+\item $f(x)=0$对于任意的自变量$x$，这意味着系统不存在任何未建模动态特性；
+\item $f(x)$的值受限于其他已知函数，即$\underline{f}(x)\leq f(x)\leq\overline{f}(x)$，其中$\underline{f}(x)$和$\overline{f}(x)$为已知函数；
+\item 未知函数$f(x)$和标称函数$f_{0}(x)$之间的距离在某一个已知范围内内，即$\|f(x)-f_{0}(x)\|\leq r_{f}$，这里$r_{f}\geq0$是一个已知的常数，这里函数$f_{0}(x)$可以认为是定义在赋范可测函数空间集合$\mathcal{f}$的中心；
+\item 未知函数的表达式有限可数，即$f(x)$属于某一个已知的函数集合，$f(x)\in\{f_{1}(x),f_{2}(x),f_{3}(x),\dots,\}$。
+\item 未知函数$f(x)$是满足Lipschitz定义的，即存在某个常数$L_{f}\geq0$，使得$\|f(x_{1})-f(x_{2})\|\leq L\|x_{1}-x_{2}\|$成立；
+\item 未知函数$f(x)$是相对于自变量来说是单调递增（或者递减）的；
+\item 未知函数$f(x)$是凸函数（或者凹函数）;
+\item $\dots$
+\end{itemize}
+
+未知随机干扰$\omega_{k}$可能存在如下的先验知识：
+\begin{itemize}%
+\item $\omega_{k}=0$对于任意的$k\geq0$，这意味着系统不存在随机干扰；
+\item $\omega_{k}$的取值在一个已知的范围内，即上下界已知，$\underline{\omega}\leq\omega_{k}\leq\overline{\omega}$；
+\item $\omega_{k}$的取值受限于其他已知的干扰序列，即$\underline{\omega}_{k}\leq\omega_{k}\leq\overline{\omega}_{k}$；
+\item $\omega_{k}$的取值都来自于一个已知的集合，即$\omega_{k}\in\{e_{1}, e_{2},\ldots,e_{N}\}$；
+\item $\omega_{k}$的统计特性符合某种概率分布；例如$\omega_{k}$是高斯随机过程，则$E(\omega_{k})=0$，$E(\omega_{k}^{2})=\sigma^{2}$；又比如$\omega_{k}$的取值满足均匀分布，即$\omega_{k}\sim U(0,1)$；
+\item $\omega_{k}$是一个衰减的序列，如$\omega_{k}=\frac1{k^{2}}$；
+\item $\dots$
+\end{itemize}
 
 \section{信息浓缩估计}
 \label{sect:2.3}
+
+参数估计算法
+
 半参数自适应控制给出了一种新的理论框架，解决两种不确定性同时出现的系统。现有的半参数自适应控制实现了一维情形下的参数估计算法，但二阶及其以上的参数估计并未具体实现，这涉及计算几何的知识。因此设计高阶情形下基于信息浓缩思想的参数估计算法是实现半参数自适应控制的前提。
