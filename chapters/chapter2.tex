@@ -52,7 +52,7 @@ y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1}
 \end{eqnarray}
 参数部分和非参数部分涉及的回归向量不一定相同，因此分别定义更加具有概括性。再记
 \begin{eqnarray}
-d_{1}=p_{1}+q_{1}
+d_{1}=p_{1}+q_{1}\\
 d_{2}=p_{2}+q_{2}
 \end{eqnarray}
 分别代表了回归向量$\bm{\phi_{k}}$和$\bm{\psi_{k}}$的维数。
@@ -105,7 +105,7 @@ d_{2}=p_{2}+q_{2}
 \label{sect:2.3}
 \subsection{提出背景}
 \label{subsec:2.3.1}
-按照必然等价原理，为了控制系统\eqref{eq:semi-u}，需要辨识其中的未知参数向量$\bm{\theta}$。文献中已经存在很多经典的参数估计算法，例如递推最小二乘算法（RLS）、卡尔曼滤波（KF）算法、最小均方算法（LMS）等。不过这些算法大部分都是基于线性系统建立的估计算法。由于系统存在非参数部分$f(\cdot)$，因此不能直接使用。实验数据\upcite{MaLum2009}表明，在非线性对象中盲目使用基于线性系统的参数估计算法会导致估计结果偏差较大。
+按照必然等价原理，为了控制系统\eqref{eq:semi-u}，需要辨识其中的未知参数向量$\bm{\theta}$。文献中已经存在很多经典的参数估计算法，例如递推最小二乘算法（RLS）、卡尔曼滤波（KF filter）算法、最小均方算法（LMS）等。不过这些算法大部分都是基于线性系统建立的估计算法。由于系统存在非参数部分$f(\cdot)$，因此不能直接使用。实验数据\upcite{MaLum2009}表明，在非线性对象中盲目使用基于线性系统的参数估计算法会导致估计结果偏差较大。
 
 被研究的系统\eqref{eq:semi-u}经常存在随机干扰。在系统辨识、信号处理、随机逼近、状态估计以及传统的自适应控制等领域中\upcite{Guo1992}，基于噪声或者干扰统计特性的参数估计算法应用十分广泛。随机干扰是系统的一种不确定性，为了描述和设计相应的参数估计算法，总是假设被研究的系统中的随机干扰符合某种统计特性。这是利用先验知识转化为可描述的数学关系的方法。本文在\ref{subsec:2.2.4}中也把统计特性作为先验知识的例子说明。事实上，随机干扰可能存在若干种来源，导致这些干扰或误差的概率分布（如果存在）并不符合模型假定的特性，最终使得这些估计算法在实际应用过程中失效。例如，如果对随机干扰的先验知识没有深入了解或测量，一种普遍的做法是假设其干扰服从某种高斯分布。这种做法在很多情况下确实有效，结果较为准确，但是对于有些情况可能就会偏离很远。为了使结果准确，可能需要调节高斯分布的方差等参数。
 
@@ -235,7 +235,14 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \end{split}
 \end{equation}
 
-经过上面的推导，\eqref{eq.sk.d1}，\eqref{eq.Ck.d1}和\eqref{eq.hk.d1}就是$d=1$情形下的信息浓缩参数算法的具体公式。
+经过上面的推导，\eqref{eq.sk.d1}，\eqref{eq.Ck.d1}和\eqref{eq.hk.d1}就是$d=1$情形下的信息浓缩参数算法的具体公式，上面的过程可以表示为图\ref{fig.1d.export}。
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth ]{fig-1d-export}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+	\caption{$d_{1}=1$时，信息浓缩过程的几何解释}
+	\label{fig.1d.export}
+\end{figure}
+
 \subsubsection{多维参数情形}
 \label{subsec2.3.3.2}
 当$d_{1}>1$时，$\bm{\theta}$和$\bm{\phi_{k}}$都是向量，和方程\eqref{eq.Ik.d1}类似可以得到
@@ -247,8 +254,8 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \begin{equation}%
 \label{eq.the.phi.d2}
 \begin{split}%
-&\bm{\phi}_{k-1}^{T}\cdot\bm{\theta}\leq y_{k}-u_{k-1}-\overline{z}\\
-&(-\bm{\phi}_{k-1}^{T})\cdot\bm{\theta}\leq -(y_{k}-u_{k-1}-\underline{z})
+\bm{\phi}_{k-1}^{T}\cdot\bm{\theta}&\leq y_{k}-u_{k-1}-\overline{z}\\
+(-\bm{\phi}_{k-1}^{T})\cdot\bm{\theta}&\leq -(y_{k}-u_{k-1}-\underline{z})
 \end{split}
 \end{equation}
 
@@ -277,23 +284,35 @@ f_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
 f_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 \end{split}
 \end{equation}
-本文\eqref{eq.nq.d2}为线性约束。和$d_{1}=1$情形类似，可以得到信息约束的递推形式为
+本文称\eqref{eq.nq.d2}为线性约束。和$d_{1}=1$情形类似，可以得到信息约束的递推形式为
 \begin{equation}%
 \begin{split}%
 \beta_{k-1}'&=G(\beta_{k-1},\bm{\phi_{k-1}},f_{k,1})\\
 \beta_{k}&=G(\beta_{k-1}',\bm{\phi_{k-1}},f_{k,2})
 \end{split}
 \end{equation}
-这里$G(\beta,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\beta_{k}$中加入一个线性约束$\bm{\phi}\cdot\bm{\theta}\leq f$。
+这里$G(\beta,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\beta$中加入一个线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq f$。
 
-图\ref{fig.2d.G}展示了$d_{1}=2$时$G$变换的过程。图中，原有的参数区域是由顶点集$\{P_{1},P_{2},P_{3},P_{4},P_{5}\}$围成的多边形，加入线性约束$L$之后，变成了顶点集$\{P_{1}’,P_{2}‘,P_{3},P_{4},P_{5}\}$围成的多边形。
+图\ref{fig.2d.export}展示了$d_{1}=2$时$G$变换的过程。图中，原有的参数区域是由顶点集
+\begin{equation}%
+\{P_{1},P_{2},P_{3},P_{4},P_{5}\}
+\end{equation}
+围成的多边形，加入线性约束条件$L$之后，变成了顶点集
+\begin{equation}%
+\{P_{1}’,P_{2}‘,P_{3},P_{4},P_{5}\}
+\end{equation}
+围成的多边形（深色部分）。
+
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth ]{fig-2d-export}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
-	\caption{}
-	\label{fig.2d.G}
+	\caption{$d_{1}=2$时，信息浓缩$G$变换过程的几何解释}
+	\label{fig.2d.export}
 \end{figure}
 
+可以看出，多边形的面积在原来的基础上缩小了，即参数的可行域减少了，参数不确定性随着也就减少了。不过图\ref{fig.2d.export}只是线性约束和多边形位置的一种情况，因为可能直线$L$和多边形没有交点，那么经过这个时刻的信息浓缩后，参数集合不变。因此在设计算法实现时需要考虑周全，否则可能导致$C_{\infty}=\varnothing$的出现。
+
+$d_{1}>2$时高维情形的情况类似，只是多边形变成了多面体，直线变成了广义半平面，由于多维情形不容易形象描述，此处就不再一一画出图形说明，留给读者自己想象。
 
 \begin{algo}%
 \label{algo:d=2}

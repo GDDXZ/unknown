@@ -43,16 +43,19 @@ y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 
 设计上述被控对象的自适应控制器的难点在于如何解决同时存在被控系统的参数不确定性和非参数不确定性\upcite{YangChaiZhai2009}。运动控制系统在高速或者超低速等情况下往往具有很大的不确定性，需要自适应反馈，诸如此类。近年来，郭雷院士等学者\upcite{XieGuo1999}指出自适应反馈机制是存在极限的。受自适应反馈机制的最大能力和局限这一研究方向的启发，马宏宾等学者\upcite{MaLum2009}引入基于集合的辨识方法和数据驱动的思想，归纳出了一种等价模型，即半参数系统（semi-parametric system）用来刻画大部分非线性离散时间对象，由此提出了半参数自适应控制这一研究方向。相比于前面提到的常见自适应控制算法，半参数自适应控制出发点具有独特性，和常见的自适应控制算法的详细比较见表\eqref{tab:adaptive}。半参数自适应控制这一研究方向结合了先验知识和数据驱动的思想，设计思路不依赖于具体的被控对象，是一种比较新颖的思路。目前半参数自适应控制中的非线性部分辨识主要考虑采用的是最近邻估计（nearest-neighbor estimate），这种方法未必最优，可以引入其他非线性辨识方法作进一步的优化和扩展。半参数自适应控制目前正处于探索期，还有待于深入和推广。
 
-\begin{table}\centering
-\caption{常见自适应控制算法比较}
-\label{tab:adaptive}
-\begin{tabular}{|c|c|c|c|}\hline
-算法名称 & 时间特性 & 适用对象 & 系统不确定性类别 \\ \hline
-模型参考自适应控制 &  大部分为连续时间 & 线性系统 & 参数不确定性\\ \hline
-自校正调节器 &  大部分为离散时间 & 线性系统 & 参数不确定性\\ \hline
-无模型自适应控制 & 大部分为离散时间  & 非线性系统 & 非参数不确定性\\ \hline
-半参数自适应控制 & 离散时间  & 非线性系统 & 参数和非参数不确定性\\ \hline
-\end{tabular}
+\begin{table}
+\centering
+\caption{常见自适应控制算法比较}\label{tab:adaptive}
+\begin{tabular*}{0.9\textwidth}{@{\extracolsep{\fill}}cccc}
+\toprule
+算法名称		&时间特性	&适用对象	&系统不确定性类别 \\
+\midrule
+模型参考自适应控制		&大部分为连续时间	&线性系统&参数\\
+自校正调节器		&大部分为离散时间	& 线性系统&参数\\
+无模型自适应控制		&大部分为离散时间	&非线性系统&非参数\\
+半参数自适应控制		&离散时间&非线性系统	&参数和非参数\\
+\bottomrule
+\end{tabular*}
 \end{table}
 
 \subsection{非线性估计与神经网络}%\label{subsec:***} 可标注label
@@ -63,7 +66,7 @@ y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 
 \begin{figure}
  \centering
- \includegraphics[width=0.7\textwidth]{figures/NN.jpg}
+ \includegraphics[width=0.7\textwidth]{NN.jpg}
  \caption{多层神经网络示意图（含2个隐含层）}\label{fig:MNN}
 \end{figure}
 
@@ -87,7 +90,7 @@ y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 
 \begin{figure}
  \centering
- \includegraphics[width=0.7\textwidth]{figures/ELM}
+ \includegraphics[width=0.7\textwidth]{ELM}
  \caption{超限学习机的网络结构（单隐层）和算法流程}\label{fig:elm}
 \end{figure}
 
