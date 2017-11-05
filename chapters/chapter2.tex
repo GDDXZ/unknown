@@ -40,12 +40,24 @@ y_{k+1} = f(y_{K},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 
 上述事实说明了实际系统表现出的线性特性有助于解决非线性自适应控制问题，不可忽视。这样看来，一般的非线性系统都可以看作是由线性部分和非线性部分组成。也就说是，在分析具有强非线性的不确定离散时间被控系统时，要同时考虑系统存在的参数不确定性和非参数不确定性。受反馈机制能力与极限等相关研究的启发，用半参数系统刻画非线性离散时间被控对象，然后基于半参数系统建立自适应控制律，是一种很自然的思路。半参数系统的模型并不唯一。
 
-首先考虑如下一种半参数模型
+首先考虑如下一类半参数模型
 \begin{equation}%
 \label{eq:semi-u}
-y_{k+1} = \theta^{T}\bm{\phi_{k}}+f(\phi_{k})+ u_{k}+\omega_{k+1}
+y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1}
 \end{equation}
-其中，$y_{k}$，$u_{k}$分别表示系统在$k$时刻的输出和输入，$\bm{\phi_{k}}$是回归向量。系统的输出$y_{k}$对应到实际的伺服电机系统中可能就是需要控制的电机转速或者位置等物理量，而$u_k$可能就是控制电流（或者控制力矩）等。$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\omega_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\omega_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、$\Theta$是向量集合、$\Delta_{k}$是普通的数值集合。
+其中，$y_{k}$，$u_{k}$分别表示系统在$k$时刻的输出和输入，由它们的历史数据组成的回归向量$\bm{\phi_{k}}$和$\bm{\psi_{k}}$具体定义如下:
+\begin{eqnarray}
+\bm{\phi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{1}},u_{k-1},\dots,u_{k-q_{1}+1}]^{T}\\
+\bm{\psi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{2}},u_{k-1},\dots,u_{k-q_{2}+1}]^{T}
+\end{eqnarray}
+参数部分和非参数部分涉及的回归向量不一定相同，因此分别定义更加具有概括性。再记
+\begin{eqnarray}
+d_{1}=p_{1}+q_{1}
+d_{2}=p_{2}+q_{2}
+\end{eqnarray}
+分别代表了回归向量$\bm{\phi_{k}}$和$\bm{\psi_{k}}$的维数。
+
+系统的输出$y_{k}$对应到实际的伺服电机系统中可能就是需要控制的电机转速或者位置等物理量，而$u_k$可能就是控制电流（或者控制力矩）等。$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\omega_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\omega_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、$\Theta$是向量集合、$\Delta_{k}$是普通的数值集合。
 
 上述的模型\eqref{eq:semi-u}直观地反映了被控系统的参数不确定性和非参数不确定性，综合性和普适性较强。关于不确定性的先验知识也是半参数系统中的组成部分。下面分别对这三个量从数学关系上描述一些先验知识的例子。
 \subsection{未知参数的先验知识}
@@ -109,7 +121,7 @@ y_{k+1} = \theta^{T}\bm{\phi_{k}}+f(\phi_{k})+ u_{k}+\omega_{k+1}
 下面基于数学语言详细解释息浓缩估计器的具体思路。这里再次考虑系统
 \begin{equation}%
 \label{eq:semi-u2}
-y_{k+1} = \theta^{T}\bm{\phi_{k}}+ u_{k}+ f(\phi_{k}) + \omega_{k+1},
+y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{x_{k}})+\omega_{k+1},
 \end{equation}
 并记
 \begin{eqnarray}
@@ -131,7 +143,7 @@ I_{k}\triangleq\{\theta\in\Theta\colon y_{k}-\phi_{k-1}^{T}\theta-u_{k-1}\in V_{
 \end{equation}
 然后定义如下所谓的信息浓缩集合
 \begin{equation}
-\label{eq.Ck1}
+\label{eq.CkIk}
 C_{k} = \bigcap_{j=0}^{k}I_{k}
 \end{equation}
 写成递推的形式为
@@ -175,20 +187,20 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 \end{eqnarray}
 这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\omega{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
 
-本节以及后面的章节也主要考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。这里首先给出$d=1$时$C_{k}$的推导过程。
-\subsubsection{一维情形}
+本节以及后面的章节也主要考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d_{1}=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。这里首先给出$d_{1}$为1时，$C_{k}$的推导过程。
+\subsubsection{一维参数情形}
 \label{subsec2.3.3.1}
-当$d=1$时，$\bm{\theta}=\theta$和$\phi_{k-1}$都是标量。由方程\eqref{eq.Ik}可知
+当$d_{1}=1$时，$\theta$和$\phi_{k}$都是标量。由方程\eqref{eq.Ik}可知
 \begin{equation}
 \label{eq.Ik.d1}
 I_{k}\triangleq\{\theta\in\Theta\colon \underline{z}\leq y_{k}-\phi_{k-1}\theta-u_{k-1}\leq\overline{z}\}
 \end{equation}
 解上面的不等式得到
 \begin{equation}%
-\label{eq.the.phi.d1}
+\label{eq.nq.d1}
 y_{k}-u_{k-1}-\overline{z}\leq\theta\phi_{k-1}\leq y_{k}-u_{k-1}-\underline{z}.
 \end{equation}
-如果$\phi_{k-1}=0$，则
+如果$\phi_{k-1}\neq0$，则
 \begin{equation}%
 \theta\in[\underline{s}_{k},\overline{s}_{k}]
 \end{equation}
@@ -209,7 +221,7 @@ $\mathrm{sign}(\cdot)$是常见的符号函数：
 &-1,\ \for x<0
 \end{aligned}
 \end{equation}
-一般来说，$C_{0}$直接由先验知识$\Theta$给出一个区间范围。在时刻$k$，由方程\eqref{eq.Ck1}得到信息浓缩集合（参数集）为
+一般来说，$C_{0}$直接由先验知识$\Theta$给出一个区间范围。在时刻$k$，由方程\eqref{eq.CkIk}得到信息浓缩集合（参数集）为
 \begin{equation}%
 \label{eq.Ck.d1}
 C_{k}=[\underline{h}_{k},\overline{h}_{k}]
@@ -224,9 +236,9 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \end{equation}
 
 经过上面的推导，\eqref{eq.sk.d1}，\eqref{eq.Ck.d1}和\eqref{eq.hk.d1}就是$d=1$情形下的信息浓缩参数算法的具体公式。
-\subsubsection{多维情形}
+\subsubsection{多维参数情形}
 \label{subsec2.3.3.2}
-当$d>1$时，$\bm{\theta}$和$\bm{\phi_{k}}$都是向量，和方程\eqref{eq.Ik.d1}类似可以得到
+当$d_{1}>1$时，$\bm{\theta}$和$\bm{\phi_{k}}$都是向量，和方程\eqref{eq.Ik.d1}类似可以得到
 \begin{equation}%
 \label{eq.the.phi.d2}
 \bm{\phi}_{k-1}^{T}\bm{\theta}\in[y_{k}-u_{k-1}-\overline{z},y_{k}-u_{k-1}-\underline{z}].
@@ -240,7 +252,49 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \end{split}
 \end{equation}
 
-方程组\eqref{eq.the.phi.d2}中的任意一个线性不等式的解都代表着一个在域$\mathcal{R}^{d}$上的一个广义半平面。因此，通常来说，关于同一向量$\bm{\theta}$的多个线性不等式的解在在几何上表示为一个广义多边形，仅需要找出广义多边形的顶点（向量）就可确定这个广义多边形。特别的，$d=2$时，多个方程组\eqref{eq.the.phi.d2}的解就是一个平面上的一个多边形。
+从几何上看，方程组\eqref{eq.the.phi.d2}中的任意一个线性不等式的解，都代表着一个定义在域$\mathcal{R}^{d}$上的广义半平面。因此，通常来说，关于同一向量$\bm{\theta}$的多个线性不等式的解在在几何上表示为一个广义多边形或者多面体，仅需要找出这个多面体的顶点（向量）就可确定这个多面体。特别的，$d=2$时，多个方程组\eqref{eq.the.phi.d2}的解就是平面上的一个普通多边形，确定了这个多边形的顶点就等价于确定了参数满足的集合$C_{k}$。
+
+记
+\begin{equation}%
+\label{eq.Vk}
+\beta_{k}=\{P_{n},n=1,2,\ldots,N_{k}\}
+\end{equation}
+为定义在区域$C_{k}$上的多面体顶点集合，其中$P_{n}$代表某个顶点，第$k$时刻集合$\beta_{k}$包含$N_{k}$个顶点。这里$\beta_{k}$记为一个多面体。下面先给出多维情形的一般公式。
+
+由方程\eqref{eq.CkIk}可知，从约束条件来看，集合$C_{k}$比$C_{k-1}$多了一组不等式
+\begin{equation}%
+\label{eq.nq.d2}
+\begin{split}%
+\bm{\phi_{k-1}}^{T}&\cdot\bm{\theta}\leq f_{k,1}\\
+(-\bm{\phi_{k-1}}^{T})&\cdot\bm{\theta}\leq f_{k,2}
+\end{split}
+\end{equation}
+其中
+\begin{equation}%
+\label{eq.fk}
+\begin{split}%
+f_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
+f_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
+\end{split}
+\end{equation}
+本文\eqref{eq.nq.d2}为线性约束。和$d_{1}=1$情形类似，可以得到信息约束的递推形式为
+\begin{equation}%
+\begin{split}%
+\beta_{k-1}'&=G(\beta_{k-1},\bm{\phi_{k-1}},f_{k,1})\\
+\beta_{k}&=G(\beta_{k-1}',\bm{\phi_{k-1}},f_{k,2})
+\end{split}
+\end{equation}
+这里$G(\beta,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\beta_{k}$中加入一个线性约束$\bm{\phi}\cdot\bm{\theta}\leq f$。
+
+图\ref{fig.2d.G}展示了$d_{1}=2$时$G$变换的过程。图中，原有的参数区域是由顶点集$\{P_{1},P_{2},P_{3},P_{4},P_{5}\}$围成的多边形，加入线性约束$L$之后，变成了顶点集$\{P_{1}’,P_{2}‘,P_{3},P_{4},P_{5}\}$围成的多边形。
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth ]{fig-2d-export}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+	\caption{}
+	\label{fig.2d.G}
+\end{figure}
+
+
 \begin{algo}%
 \label{algo:d=2}
 \end{algo}
