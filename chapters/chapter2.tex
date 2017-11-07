@@ -3,12 +3,10 @@
 %% version: 0.1
 %% last update: Nov 8th, 2017
 %%==================================================
-\chapter{半参数系统与信息浓缩估计}
-\label{chap:2}
+\chapter{半参数系统与信息浓缩估计}\label{chap:2}
 传统鲁棒控制主要考虑小范围的结构不确定性，传统自适应控制主要考虑系统的参数不确定性，而一般的非线性自适应控制直接考虑非线性模型从而设计复杂的控制器。实际问题中参数不确定性和较大的结构不确定性可同时出现，因此这些方法对于解决非线性不确定性被控对象的离散时间控制问题都存在一定的局限性。所有的被控对象本质上都是非线性的，但是线性控制方法在反馈控制前期发展中起到了很大作用。这不由得让人思考，是否很多非线性对象都存在一个起主要作用的线性模型？按照这个思路，虽然无法精确的已知非线性不确定性系统的离散化模型，但是这些非线性系统可以用一个线性模型（如ARX模型）加上一个非线性部分（关于输入输出数据的未知函数）近似，也就是把系统的不确定性分为参数和非参数不确定性。为了解决控制问题，需要先辨识参数部分。这就是本章要介绍的半参数系统和所谓的信息浓缩（information concentration estimate, IC）估计。
 
-\section{反馈机制极限的探索}
-\label{sect:2.1}
+\section{反馈机制极限的探索}\label{sect:2.1}
 不管是采用连续时间模型还是离散时间角度设计控制律，实际系统都会存在无法预测的不确定性，如干扰、未建模动态等，这会导致输出就会产生偏差。反馈从一开始就是为了解决这种偏差和不确定性而引入的。传统针对线性时不变系统设计的控制方法属于线性反馈。然而，即便是针对ARX模型设计的自校正调节器，自适应控制从本质上说是一种非线性反馈\upcite{Guo2003}。当系统存在不确定性时，在设计自适应辨识与控制算法时，是否一定存在一种自适应控制律能够使得系统闭环稳定？这是在设计自适应控制之前首先要回答的问题。然而直到20世纪90年代末，郭雷院士等学者开始探索反馈机制\upcite{Guo1997}，创造性地提出反馈机制的最大能力和局限（the limit to the capability of feedback）这一重要命题，并针对一些基本控制系统的自适应反馈极限进行定量研究，才引起来广泛的关注。
 
 最开始关于反馈机制的研究始于一类基本的不确定非线性系统，即下面的模型
@@ -27,10 +25,8 @@ y_{k+1} = f(y_{k}) + u_{k} + \omega_{k+1},\ f(\dot)\in F(L)
 
 目前关于反馈机制及能力的研究主要针对离散时间控制系统，这与离散时间控制器的广泛应用这一大趋势不谋而合，并且一开始就考虑到了非参数不确定性，因而具有较好的理论高度和普适性。反馈机制及能力给出了对不确定性系统的认识，从理论上看，不是所有的未知系统都可以设计出稳定的自适应控制律\upcite{Ma2008}；用但是同时也留下了一个问题：如果系统属于自适应反馈控制可稳定的范围内，那么如何设计出合适的自适应反馈控制律使系统达到满意的性能？一般来说，不同的被控对象自然结构和参数都不同，但是否存在一种较为通用的模型可以刻画大部分面对的被控对象？可以类比经典控制理论，毕竟线性系统和微分方程这些通用工具在几十年的控制理论中起到了关键的作用。类似这样的问题促进了半参数模型的提出。
 
-\section{半参数系统}
-\label{sect:2.2}
-\subsection{模型描述}
-\label{subsec:2.2.1}
+\section{半参数系统}\label{sect:2.2}
+\subsection{模型描述}\label{subsect:2.2.1}
 虽然数字化控制器输出到被控对象的信号是离散时间，但是实际的过程是连续时间变化的。一般的离散时间非线性控制往往忽略了这一点，就导致这些研究侧重于理论和离散时间仿真分析。再次考虑下面的NARX系统
 \begin{equation}%
 \label{eq:NARX2}
@@ -60,8 +56,8 @@ d_{2}=p_{2}+q_{2}
 系统的输出$y_{k}$对应到实际的伺服电机系统中可能就是需要控制的电机转速或者位置等物理量，而$u_k$可能就是控制电流（或者控制力矩）等。$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\omega_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\omega_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、$\Theta$是向量集合、$\Delta_{k}$是普通的数值集合。
 
 上述的模型\eqref{eq:semi-u}直观地反映了被控系统的参数不确定性和非参数不确定性，综合性和普适性较强。关于不确定性的先验知识也是半参数系统中的组成部分。下面分别对这三个量从数学关系上描述一些先验知识的例子。
-\subsection{未知参数的先验知识}
-\label{subsec:2.2.2}
+\subsection{先验知识举例}\label{subsect:2.2.2}
+\subsubsection{未知参数}\label{subsubsect:2.2.2.1}
 记
 \begin{equation}%
 \label{eq:}
@@ -75,8 +71,7 @@ d_{2}=p_{2}+q_{2}
 \item 未知参数向量的取值有限可数，即$\bm{\theta}$属于某一个已知的集合，$\bm{\theta}\in\{\bm{\theta}_{1},\bm{\theta}_{2},\bm{\theta}_{3},\dots,\}$；
 \item $\dots$
 \end{itemize}
-\subsection{未知函数的先验知识}
-\label{subsec:2.2.3}
+\subsubsection{未知函数}\label{subsubsect:2.2.2.2}
 未知函数$f(\cdot)$在实际系统如电机物理系统中，对应可能就是难以建模的非线性摩擦力（力矩）、高频振动特性等。$f(\cdot)$可能存在如下的某种先验知识：
 \begin{itemize}
 \item $f(x)=0$对于任意的自变量$x$，这意味着系统不存在任何未建模动态特性；
@@ -88,8 +83,7 @@ d_{2}=p_{2}+q_{2}
 \item 未知函数$f(x)$是凸函数（或者凹函数）;
 \item $\dots$
 \end{itemize}
-\subsection{随机干扰的先验知识}
-\label{subsec:2.2.4}
+\subsubsection{随机干扰}\label{subsubsect:2.2.2.3}
 随机干扰一般来源于测量误差、未知干扰等，$\omega_{k}$可能存在如下的先验知识：
 \begin{itemize}%
 \item $\omega_{k}=0$对于任意的$k\geq0$，这意味着系统不存在随机干扰；
@@ -101,20 +95,17 @@ d_{2}=p_{2}+q_{2}
 \item $\dots$
 \end{itemize}
 
-\section{信息浓缩估计}
-\label{sect:2.3}
-\subsection{提出背景}
-\label{subsec:2.3.1}
-按照必然等价原理，为了控制系统\eqref{eq:semi-u}，需要辨识其中的未知参数向量$\bm{\theta}$。文献中已经存在很多经典的参数估计算法，例如递推最小二乘算法（RLS）、卡尔曼滤波（KF filter）算法、最小均方算法（LMS）等。不过这些算法大部分都是基于线性系统建立的估计算法。由于系统存在非参数部分$f(\cdot)$，因此不能直接使用。实验数据\upcite{MaLum2009}表明，在非线性对象中盲目使用基于线性系统的参数估计算法会导致估计结果偏差较大。
+\section{信息浓缩估计}\label{sect:2.3}
+\subsection{提出背景}\label{subsect:2.3.1}
+按照必然等价原理，为了控制系统\eqref{eq:semi-u}，需要辨识其中的未知参数向量$\bm{\theta}$。文献中已经存在很多经典的参数估计算法，例如递推最小二乘算法（RLS）、卡尔曼滤波（Kalman filter,KF）算法、最小均方算法（LMS）等。不过这些算法大部分都是基于线性系统建立的估计算法。由于系统存在非参数部分$f(\cdot)$，因此不能直接使用。实验数据\upcite{MaLum2009}表明，在非线性对象中盲目使用基于线性系统的参数估计算法会导致估计结果偏差较大。
 
-被研究的系统\eqref{eq:semi-u}经常存在随机干扰。在系统辨识、信号处理、随机逼近、状态估计以及传统的自适应控制等领域中\upcite{Guo1992}，基于噪声或者干扰统计特性的参数估计算法应用十分广泛。随机干扰是系统的一种不确定性，为了描述和设计相应的参数估计算法，总是假设被研究的系统中的随机干扰符合某种统计特性。这是利用先验知识转化为可描述的数学关系的方法。本文在\ref{subsec:2.2.4}中也把统计特性作为先验知识的例子说明。事实上，随机干扰可能存在若干种来源，导致这些干扰或误差的概率分布（如果存在）并不符合模型假定的特性，最终使得这些估计算法在实际应用过程中失效。例如，如果对随机干扰的先验知识没有深入了解或测量，一种普遍的做法是假设其干扰服从某种高斯分布。这种做法在很多情况下确实有效，结果较为准确，但是对于有些情况可能就会偏离很远。为了使结果准确，可能需要调节高斯分布的方差等参数。
+被研究的系统\eqref{eq:semi-u}经常存在随机干扰。在系统辨识、信号处理、随机逼近、状态估计以及传统的自适应控制等领域中\upcite{Guo1992}，基于噪声或者干扰统计特性的参数估计算法应用十分广泛。随机干扰是系统的一种不确定性，为了描述和设计相应的参数估计算法，总是假设被研究的系统中的随机干扰符合某种统计特性。这是利用先验知识转化为可描述的数学关系的方法。本文在\ref{subsubsect:2.2.2.3}中也把统计特性作为先验知识的例子说明。事实上，随机干扰可能存在若干种来源，导致这些干扰或误差的概率分布（如果存在）并不符合模型假定的特性，最终使得这些估计算法在实际应用过程中失效。例如，如果对随机干扰的先验知识没有深入了解或测量，一种普遍的做法是假设其干扰服从某种高斯分布。这种做法在很多情况下确实有效，结果较为准确，但是对于有些情况可能就会偏离很远。为了使结果准确，可能需要调节高斯分布的方差等参数。
 
-在实际工程中，随机干扰的数值往往较小（如果较大，就得考虑把他当作非线性部分了），且一般可以不会超过某个已知范围，对应\ref{subsec:2.2.4}中的第2个例子。这不是一种基于概率统计的先验知识，能够比较准确地反映真实的情况。比如在某个伺服电机系统中的电磁干扰导致的脉动力矩，一般不会超过某个幅值。和随机干扰类似，系统的非参数部分$f(\cdot)$部分的先验知识也常常是一个范围，即区间的形式。比如经过理论分析，电机的摩擦力不会超过某个数值，多关节机器人运动控制中重力这一非线性项是一个有限值等情形。
+在实际工程中，随机干扰的数值往往较小（如果较大，就得考虑把他当作非线性部分了），且一般可以不会超过某个已知范围，对应\ref{subsubsect:2.2.2.3}中的第2个例子。这不是一种基于概率统计的先验知识，能够比较准确地反映真实的情况。比如在某个伺服电机系统中的电磁干扰导致的脉动力矩，一般不会超过某个幅值。和随机干扰类似，系统的非参数部分$f(\cdot)$部分的先验知识也常常是一个范围，即区间的形式。比如经过理论分析，电机的摩擦力不会超过某个数值，多关节机器人运动控制中重力这一非线性项是一个有限值等情形。
 
 因此由于上面种种因素的存在，需要另辟蹊径解决系统\eqref{eq:semi-u}的参数估计问题，传统的基于数值的估计算法难以利用基于集合的先验知识。
-\subsection{主要思想}
-\label{subsec:2.3.2}
-为了实现参数估计，需要综合充分利用系统的先验知识。从\ref{subsec:2.2.2}到\ref{subsec:2.2.4}介绍的先验知识可以看出，对参数向量$\bm{\theta}$、非参数部分$f(\cdot)$、随机干扰$\omega$等不确定性的等价数学描述一般都是表现为集合的形式，因此设计基于集合的参数估计是一种自然的思路。文献\cite{MaLum2009}中提出的信息浓缩估计就是这样的一类估计算法。
+\subsection{主要思想}\label{subsect:2.3.2}
+为了实现参数估计，需要综合充分利用系统的先验知识。从\ref{subsubsect:2.2.2.1}到\ref{subsubsect:2.2.2.3}介绍的先验知识可以看出，对参数向量$\bm{\theta}$、非参数部分$f(\cdot)$、随机干扰$\omega$等不确定性的等价数学描述一般都是表现为集合的形式，因此设计基于集合的参数估计是一种自然的思路。文献\cite{MaLum2009}中提出的信息浓缩估计就是这样的一类估计算法。
 
 信息浓缩估计是一种针对离散时间系统的基于集合的参数估计器，其主要思想是从初始的关于参数的先验集合出发，将每一时刻的先验知识都看作是对未知函数和参数的数学约束，然后结合采集到的真实的输入输出数据剔除掉不符合真实数据的取值，逐渐缩小这个先验集合的大小，也就减少了系统的参数不确定性；这样经过足够长的时间和数据筛选之后，理论上可以从参数集合中选择任意值或者根据一定的规则选择最优值作为最终的参数估计。
 
@@ -176,8 +167,7 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 \end{prop}
 
 命题\ref{thm:ic1}第三条的具体含义是：如果模型和相应的先验知识以及参与计算的数据是完全正确的，那么$C_{\infty}$必定是一个非空集合，并且满足真实的参数向量$\bm{\theta}\in C_{\infty}$，集合$C_{\infty}$的任意一个元素都可以匹配模型和数据；反过来，也成立。但是，如果$C_{\infty}=\varnothing$说明参与计算的数据、模型设置或者先验知识中某个部分存在问题，不是相对应的，那么就会导致结果出现偏差。这个充要条件一般来说比较容易满足的，可以把先验知识设定足够宽泛，并保证参与计算的数据都来源于真实的系统，至于野值的出现属于数据和信息预处理的问题，就不是本文要考虑的范畴了。
-\subsection{具体实施}
-\label{subsec:2.3.3}
+\subsection{具体实施}\label{subsect:2.3.2}
 从上面一小节\ref{subsec:2.3.2}关于信息浓缩估计器的描述和举例中，可以看出信息浓缩估计是一种在线实时估计器，充分利用了系统的先验知识和实时数据，因此也可以看作是一种数据驱动型的估计算法。随着采集到的数据不断增多，未知参数的不确定性就越来越小，我们对参数的估计就越来越准确。系统关于参数的先验知识不同，会导致信息集合$I_{k}$和信息浓缩之后的参数估计集合$C_{k}$不同，因而关于其中的递归运算\eqref{eq.Ck2}也就不同。
 
 有一种十分典型的情形，如同在上述的提出背景\ref{subsec:2.3.1}中描述的$z_{k}\in V_{k}$是区间的形式。具体数学描述为
@@ -188,8 +178,7 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\omega{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
 
 本节以及后面的章节也主要考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d_{1}=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。这里首先给出$d_{1}$为1时，$C_{k}$的推导过程。
-\subsubsection{一维参数情形}
-\label{subsec2.3.3.1}
+\subsubsection{一维参数情形}\label{subsubsect:2.3.3.1}
 当$d_{1}=1$时，$\theta$和$\phi_{k}$都是标量。由方程\eqref{eq.Ik}可知
 \begin{equation}
 \label{eq.Ik.d1}
@@ -243,8 +232,7 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 	\label{fig.1d.export}
 \end{figure}
 
-\subsubsection{多维参数情形}
-\label{subsec2.3.3.2}
+\subsubsection{多维参数情形}\label{subsubsect:2.3.3.2}
 当$d_{1}>1$时，$\bm{\theta}$和$\bm{\phi_{k}}$都是向量，和方程\eqref{eq.Ik.d1}类似可以得到
 \begin{equation}%
 \label{eq.the.phi.d2}
@@ -272,26 +260,26 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \begin{equation}%
 \label{eq.nq.d2}
 \begin{split}%
-\bm{\phi_{k-1}}^{T}&\cdot\bm{\theta}\leq f_{k,1}\\
-(-\bm{\phi_{k-1}}^{T})&\cdot\bm{\theta}\leq f_{k,2}
+\bm{\phi_{k-1}}^{T}&\cdot\bm{\theta}\leq e_{k,1}\\
+(-\bm{\phi_{k-1}}^{T})&\cdot\bm{\theta}\leq e_{k,2}
 \end{split}
 \end{equation}
 其中
 \begin{equation}%
 \label{eq.fk}
 \begin{split}%
-f_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
-f_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
+e_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
+e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 \end{split}
 \end{equation}
 本文称\eqref{eq.nq.d2}为线性约束。和$d_{1}=1$情形类似，可以得到信息约束的递推形式为
 \begin{equation}%
 \begin{split}%
-\beta_{k-1}'&=G(\beta_{k-1},\bm{\phi_{k-1}},f_{k,1})\\
-\beta_{k}&=G(\beta_{k-1}',\bm{\phi_{k-1}},f_{k,2})
+\beta_{k-1}'&=G(\beta_{k-1},\bm{\phi_{k-1}},e_{k,1})\\
+\beta_{k}&=G(\beta_{k-1}',\bm{\phi_{k-1}},e_{k,2})
 \end{split}
 \end{equation}
-这里$G(\beta,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\beta$中加入一个线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq f$。
+这里$G(\beta,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\beta$中加入一个线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq e$。
 
 图\ref{fig.2d.export}展示了$d_{1}=2$时$G$变换的过程。图中，原有的参数区域是由顶点集
 \begin{equation}%
@@ -299,7 +287,7 @@ f_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 \end{equation}
 围成的多边形，加入线性约束条件$L$之后，变成了顶点集
 \begin{equation}%
-\{P_{1}’,P_{2}‘,P_{3},P_{4},P_{5}\}
+\{P_{1}',P_{2}',P_{3},P_{4},P_{5}\}
 \end{equation}
 围成的多边形（深色部分）。
 
@@ -310,12 +298,70 @@ f_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 	\label{fig.2d.export}
 \end{figure}
 
-可以看出，多边形的面积在原来的基础上缩小了，即参数的可行域减少了，参数不确定性随着也就减少了。不过图\ref{fig.2d.export}只是线性约束和多边形位置的一种情况，因为可能直线$L$和多边形没有交点，那么经过这个时刻的信息浓缩后，参数集合不变。因此在设计算法实现时需要考虑周全，否则可能导致$C_{\infty}=\varnothing$的出现。
+可以看出，多边形的面积在原来的基础上缩小了，即参数的可行域减少了，参数不确定性随着也就减少了。不过图\ref{fig.2d.export}只是线性约束和多边形位置的一种情况，因为很可能直线$L$和多边形没有交点，那么经过这个时刻的信息浓缩后，参数集合不变。因此在设计算法实现时需要考虑周全，否则可能导致$C_{\infty}=\varnothing$的出现。
 
 $d_{1}>2$时高维情形的情况类似，只是多边形变成了多面体，直线变成了广义半平面，由于多维情形不容易形象描述，此处就不再一一画出图形说明，留给读者自己想象。
 
+\subsection{二维情形}\label{subsect:2.3.4}
+$d_{1}=2$时，信息浓缩过程$G(\cdot)$记为
+\begin{equation}%
+\beta'=\bm{AddLinear2D}(\beta,\bm{\phi},e)
+\end{equation}
+具体过程见算法\ref{alg.ic.2d}。
+
 \begin{algo}%
-\label{algo:d=2}
+\caption{$d_{1}=2$时}
+\label{alg.ic.2d}
+\begin{algorithmic}[1]
+\REQUIRE
+$\beta$: 顶点集$\{P_{1},P_{2},\ldots,P_{N}\}$
+\ENSURE
+$\beta'$：顶点集$\{P_{1}',P_{2}',\ldots,P_{N'}'\}$
+\STATE Denote the number of vertices in $\mathcal{V}$ by $n$
+\FOR{$j=1$ to $n$}
+	\STATE Denote the $jth$ vertex by $P_{j}$
+	\STATE Let $F_{j}=\mathbf{sgn}(c-\phi^{T}P_{j})$
+\ENDFOR\\
+\IF{$F_{j}\geq0\ \forall 1\leq j\leq n$}
+	\STATE $\mathcal{V'}\leftarrow\mathcal{V}$ and return
+\ELSIF{$F_{j}<0\ \forall 1\leq j\leq n$}
+	\STATE $\mathcal{V}\leftarrow\emptyset$ and return
+\ENDIF
+\FOR{$j=2$ to $n-1$}
+    \IF{($P_{j}$ and $P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j}$ and $P_{j+1}$ are in different sides)}
+		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
+		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
+		\IF {($F_{j}>0$)}
+			\STATE$\mathcal{V'}=\{P_{1}^{i},P_{j},P_{2}^{i}\}$
+		\ELSE
+			\STATE$\mathcal{V'}=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
+		\ENDIF
+        \STATE break
+    \ELSIF{($P_{j},P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j+1},\ldots,P_{j+a-1}$ are on the same side) $\bigwedge$ 
+		($P_{j+a-1},P_{j+a}$ are on different sides)}
+		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
+		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+a-1}P_{j+a}}$.
+		\IF {($F_{j}>0$)}
+			\STATE$\mathcal{V'}=\{P_{1}^{i},P_{j},\ldots,P_{j+a-1},P_{2}^{i}\}$
+		\ELSE
+			\STATE$\mathcal{V'}=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+a},\ldots,P_{n}\}$
+		\ENDIF
+        \STATE break
+	\ELSIF{($P_{j},P_{j+1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j-1},\ldots,P_{j-b+1}$ are on the same side) $\bigwedge$ 
+	($P_{j-b+1},P_{j-b}$ are on different sides)}
+		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-b+1}P_{j-b}}$
+		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
+		\IF {($F_{j}>0$)}
+			\STATE$\mathcal{V'}=\{P_{1}^{i},P_{j-b+1},\ldots,P_{j},P_{2}^{i}\}$
+		\ELSE
+			\STATE$\mathcal{V'}=\{P_{1},\ldots,P_{j-b},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
+		\ENDIF
+        \STATE break
+    \ENDIF
+	\STATE $j\leftarrow j+1$
+\ENDFOR
+\STATE return $\mathcal{V'}$
+\end{algorithmic}
 \end{algo}
 \subsection{主要特点}
 半参数自适应控制给出了一种新的理论框架，解决两种不确定性同时出现的系统。现有的半参数自适应控制实现了一维情形下的参数估计算法，但二阶及其以上的参数估计并未具体实现，这涉及计算几何的知识。因此设计高阶情形下基于信息浓缩思想的参数估计算法是实现半参数自适应控制的前提。
