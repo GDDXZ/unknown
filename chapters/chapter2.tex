@@ -167,8 +167,8 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 \end{prop}
 
 命题\ref{thm:ic1}第三条的具体含义是：如果模型和相应的先验知识以及参与计算的数据是完全正确的，那么$C_{\infty}$必定是一个非空集合，并且满足真实的参数向量$\bm{\theta}\in C_{\infty}$，集合$C_{\infty}$的任意一个元素都可以匹配模型和数据；反过来，也成立。但是，如果$C_{\infty}=\varnothing$说明参与计算的数据、模型设置或者先验知识中某个部分存在问题，不是相对应的，那么就会导致结果出现偏差。这个充要条件一般来说比较容易满足的，可以把先验知识设定足够宽泛，并保证参与计算的数据都来源于真实的系统，至于野值的出现属于数据和信息预处理的问题，就不是本文要考虑的范畴了。
-\subsection{具体实施}\label{subsect:2.3.2}
-从上面一小节\ref{subsec:2.3.2}关于信息浓缩估计器的描述和举例中，可以看出信息浓缩估计是一种在线实时估计器，充分利用了系统的先验知识和实时数据，因此也可以看作是一种数据驱动型的估计算法。随着采集到的数据不断增多，未知参数的不确定性就越来越小，我们对参数的估计就越来越准确。系统关于参数的先验知识不同，会导致信息集合$I_{k}$和信息浓缩之后的参数估计集合$C_{k}$不同，因而关于其中的递归运算\eqref{eq.Ck2}也就不同。
+\subsection{具体实施}\label{subsect:2.3.3}
+从上面一小节\ref{subsect:2.3.2}关于信息浓缩估计器的描述和举例中，可以看出信息浓缩估计是一种在线实时估计器，充分利用了系统的先验知识和实时数据，因此也可以看作是一种数据驱动型的估计算法。随着采集到的数据不断增多，未知参数的不确定性就越来越小，我们对参数的估计就越来越准确。系统关于参数的先验知识不同，会导致信息集合$I_{k}$和信息浓缩之后的参数估计集合$C_{k}$不同，因而关于其中的递归运算\eqref{eq.Ck2}也就不同。
 
 有一种十分典型的情形，如同在上述的提出背景\ref{subsec:2.3.1}中描述的$z_{k}\in V_{k}$是区间的形式。具体数学描述为
 \begin{eqnarray}%
@@ -227,7 +227,7 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 经过上面的推导，\eqref{eq.sk.d1}，\eqref{eq.Ck.d1}和\eqref{eq.hk.d1}就是$d=1$情形下的信息浓缩参数算法的具体公式，上面的过程可以表示为图\ref{fig.1d.export}。
 \begin{figure}
 	\centering
-	\includegraphics[width=0.5\textwidth ]{fig-1d-export}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+	\includegraphics[width=0.5\textwidth ]{ch2-1d-export.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
 	\caption{$d_{1}=1$时，信息浓缩过程的几何解释}
 	\label{fig.1d.export}
 \end{figure}
@@ -293,7 +293,7 @@ e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 
 \begin{figure}
 	\centering
-	\includegraphics[width=0.5\textwidth ]{fig-2d-export}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+	\includegraphics[width=0.5\textwidth ]{ch2-2d-export.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
 	\caption{$d_{1}=2$时，信息浓缩$G$变换过程的几何解释}
 	\label{fig.2d.export}
 \end{figure}
@@ -302,39 +302,74 @@ e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 
 $d_{1}>2$时高维情形的情况类似，只是多边形变成了多面体，直线变成了广义半平面，由于多维情形不容易形象描述，此处就不再一一画出图形说明，留给读者自己想象。
 
-\subsection{二维情形}\label{subsect:2.3.4}
-$d_{1}=2$时，信息浓缩过程$G(\cdot)$记为
+\subsection{算法实现}\label{subsect:2.3.4}
+如前所述，本文需要针对关联这种先验知识的系统设计信息浓缩估计器算法，其主要过程和难点在于，如何在前一时刻的顶点集的基础上，结合这一时刻得到的输入输出约束关系，得到这一时刻的顶点集，也就确定了当前时刻的参数集。这里的顶点集情况是对于$d_{1}>2$时有意义。当$d_{1}=1$时不涉及顶点集的组合，情况比较简单，上面第\ref{subsubsect:2.3.3.1}已经给出具体计算步骤。
+
+二维情形下主要是考虑直线和多边形的位置关系。图\ref{fig.2d.export}展示了直线和多边形位置关系的一种可能的例子，从这个图中可以知道求解这个顶点集涉及到计算几何的知识，需要全面考虑各种情形。如图\ref{fig.poly.l}所示。
+\begin{figure}
+	\centering
+	\subfigure[情形1.1]{	 % Caption of subfigure in []
+	\label{fig.poly.1.1}	 % Label of subfigure in {}
+	\includegraphics[width=0.45\textwidth ]{ch2-poly-00.png}}
+	\subfigure[情形1.2]{
+	\label{fig.poly.1.2}
+	\includegraphics[width=0.45\textwidth ]{ch2-poly-01.png}}
+	\subfigure[情形2.1]{	 % Caption of subfigure in []
+	\label{fig.poly.2.1}	 % Label of subfigure in {}
+	\includegraphics[width=0.45\textwidth ]{ch2-poly-10.png}}
+	\subfigure[情形2.2]{
+	\label{fig.poly.2.2}
+	\includegraphics[width=0.45\textwidth ]{ch2-poly-11.png}}
+	\subfigure[情形3.1]{	 % Caption of subfigure in []
+	\label{fig.poly.3.1}	 % Label of subfigure in {}
+	\includegraphics[width=0.45\textwidth ]{ch2-poly-20.png}}
+	\subfigure[情形3.2]{
+	\label{fig.poly.3.2}
+	\includegraphics[width=0.45\textwidth ]{ch2-poly-21.png}}
+	\caption{直线和多边形位置关系}	 % Caption of figure
+	\label{fig.poly.l}	 % Label of figure
+\end{figure}
+
+为了叙述方便，本小节关于时刻$k$的下标省略。$d_{1}=2$时，信息浓缩过程的映射关系$G(\beta,\bm{\phi},e)$可以记为
 \begin{equation}%
-\beta'=\bm{AddLinear2D}(\beta,\bm{\phi},e)
+\mathbf{AddLinear2D}\colon \beta\rightarrow\beta'
 \end{equation}
-具体过程见算法\ref{alg.ic.2d}。
+这里$\beta$和$\beta'$分别表示两个不同的多边形，其顶点集合表示（按顺时针排列，下同）为
+\begin{equation*}%
+\begin{split}%
+\beta&=\{P_{1},P_{2},\ldots,P_{N}\\
+\beta'&=\{P_{1}',P_{2}',\ldots,P_{N'}'\}
+\end{split}
+\end{equation*}
+
+本文设计了$d_{1}=2$时多边形顶点变换$G$的计算几何算法，具体过程见算法\ref{alg.ic.2d}。
 
 \begin{algo}%
-\caption{$d_{1}=2$时}
+\caption{$d_{1}=2$时多边形顶点变换$G$}
 \label{alg.ic.2d}
-\begin{algorithmic}[1]
-\REQUIRE
-$\beta$: 顶点集$\{P_{1},P_{2},\ldots,P_{N}\}$
+\begin{algorithmic}
+\REQUIRE\\
+$\beta$: 顶点集$\{P_{1},P_{2},\ldots,P_{N}\}$\\
 \ENSURE
-$\beta'$：顶点集$\{P_{1}',P_{2}',\ldots,P_{N'}'\}$
-\STATE Denote the number of vertices in $\mathcal{V}$ by $n$
-\FOR{$j=1$ to $n$}
+$\beta'$：顶点集$\{P_{1}',P_{2}',\ldots,P_{N'}'\}$\\
+\STATE Denote the number of vertices in $\beta$ by $N$
+\FOR{$j=1$ to $N$}
 	\STATE Denote the $jth$ vertex by $P_{j}$
 	\STATE Let $F_{j}=\mathbf{sgn}(c-\phi^{T}P_{j})$
-\ENDFOR\\
+\ENDFOR
 \IF{$F_{j}\geq0\ \forall 1\leq j\leq n$}
-	\STATE $\mathcal{V'}\leftarrow\mathcal{V}$ and return
+	\STATE $\beta'\leftarrow\beta$ and return
 \ELSIF{$F_{j}<0\ \forall 1\leq j\leq n$}
-	\STATE $\mathcal{V}\leftarrow\emptyset$ and return
+	\STATE $\beta\leftarrow\emptyset$ and return
 \ENDIF
-\FOR{$j=2$ to $n-1$}
+\FOR{$j=2$ to $N-1$}
     \IF{($P_{j}$ and $P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j}$ and $P_{j+1}$ are in different sides)}
 		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
 		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
 		\IF {($F_{j}>0$)}
-			\STATE$\mathcal{V'}=\{P_{1}^{i},P_{j},P_{2}^{i}\}$
+			\STATE$\beta'=\{P_{1}^{i},P_{j},P_{2}^{i}\}$
 		\ELSE
-			\STATE$\mathcal{V'}=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
+			\STATE$\beta'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
 		\ENDIF
         \STATE break
     \ELSIF{($P_{j},P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j+1},\ldots,P_{j+a-1}$ are on the same side) $\bigwedge$ 
@@ -342,9 +377,9 @@ $\beta'$：顶点集$\{P_{1}',P_{2}',\ldots,P_{N'}'\}$
 		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
 		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+a-1}P_{j+a}}$.
 		\IF {($F_{j}>0$)}
-			\STATE$\mathcal{V'}=\{P_{1}^{i},P_{j},\ldots,P_{j+a-1},P_{2}^{i}\}$
+			\STATE$\beta'=\{P_{1}^{i},P_{j},\ldots,P_{j+a-1},P_{2}^{i}\}$
 		\ELSE
-			\STATE$\mathcal{V'}=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+a},\ldots,P_{n}\}$
+			\STATE$\beta'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+a},\ldots,P_{n}\}$
 		\ENDIF
         \STATE break
 	\ELSIF{($P_{j},P_{j+1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j-1},\ldots,P_{j-b+1}$ are on the same side) $\bigwedge$ 
@@ -352,16 +387,24 @@ $\beta'$：顶点集$\{P_{1}',P_{2}',\ldots,P_{N'}'\}$
 		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-b+1}P_{j-b}}$
 		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
 		\IF {($F_{j}>0$)}
-			\STATE$\mathcal{V'}=\{P_{1}^{i},P_{j-b+1},\ldots,P_{j},P_{2}^{i}\}$
+			\STATE$\beta'=\{P_{1}^{i},P_{j-b+1},\ldots,P_{j},P_{2}^{i}\}$
 		\ELSE
-			\STATE$\mathcal{V'}=\{P_{1},\ldots,P_{j-b},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
+			\STATE$\beta'=\{P_{1},\ldots,P_{j-b},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
 		\ENDIF
         \STATE break
     \ENDIF
 	\STATE $j\leftarrow j+1$
 \ENDFOR
-\STATE return $\mathcal{V'}$
+\STATE return $\beta'$
 \end{algorithmic}
 \end{algo}
+\subsection{仿真实例}\label{subset:2.3.5}
+仿真曲线如图\ref{fig.2d.theta}所示。
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth ]{ch-2d-theta.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+	\caption{$d_{1}=2$时信息浓缩估计参数估计结果}
+	\label{fig.2d.theta}
+\end{figure}
 \subsection{主要特点}
 半参数自适应控制给出了一种新的理论框架，解决两种不确定性同时出现的系统。现有的半参数自适应控制实现了一维情形下的参数估计算法，但二阶及其以上的参数估计并未具体实现，这涉及计算几何的知识。因此设计高阶情形下基于信息浓缩思想的参数估计算法是实现半参数自适应控制的前提。
