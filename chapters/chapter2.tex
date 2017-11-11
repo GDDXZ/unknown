@@ -6,7 +6,7 @@
 \chapter{半参数系统与信息浓缩估计}\label{chap:2}
 传统鲁棒控制主要考虑小范围的结构不确定性，传统自适应控制主要考虑系统的参数不确定性，而一般的非线性自适应控制直接考虑非线性模型从而设计复杂的控制器。实际问题中参数不确定性和较大的结构不确定性可同时出现，因此这些方法对于解决非线性不确定性被控对象的离散时间控制问题都存在一定的局限性。所有的被控对象本质上都是非线性的，但是线性控制方法在反馈控制前期发展中起到了很大作用。这不由得让人思考，是否很多非线性对象都存在一个起主要作用的线性模型？按照这个思路，虽然无法精确的已知非线性不确定性系统的离散化模型，但是这些非线性系统可以用一个线性模型（如ARX模型）加上一个非线性部分（关于输入输出数据的未知函数）近似，也就是把系统的不确定性分为参数和非参数不确定性。为了解决控制问题，需要先辨识参数部分。这就是本章要介绍的半参数系统和所谓的信息浓缩（information concentration estimate, IC）估计。
 
-\section{反馈机制极限的探索}\label{sect:2.1}
+\section{反馈机制能力极限的探索}\label{sect:2.1}
 不管是采用连续时间模型还是离散时间角度设计控制律，实际系统都会存在无法预测的不确定性，如干扰、未建模动态等，这会导致输出就会产生偏差。反馈从一开始就是为了解决这种偏差和不确定性而引入的。传统针对线性时不变系统设计的控制方法属于线性反馈。然而，即便是针对ARX模型设计的自校正调节器，自适应控制从本质上说是一种非线性反馈\upcite{Guo2003}。当系统存在不确定性时，在设计自适应辨识与控制算法时，是否一定存在一种自适应控制律能够使得系统闭环稳定？这是在设计自适应控制之前首先要回答的问题。然而直到20世纪90年代末，郭雷院士等学者开始探索反馈机制\upcite{Guo1997}，创造性地提出反馈机制的最大能力和局限（the limit to the capability of feedback）这一重要命题，并针对一些基本控制系统的自适应反馈极限进行定量研究，才引起来广泛的关注。
 
 最开始关于反馈机制的研究始于一类基本的不确定非线性系统，即下面的模型
@@ -21,16 +21,16 @@ y_{k+1} = f(y_{k}) + u_{k} + \omega_{k+1},\ f(\dot)\in F(L)
 \end{equation}
 其中，$f(\cdot)$是未知函数，$F(L)$代表一类满足Lipschitz条件的非线性函数。对于这种非参数不确定性系统，有如下结论\upcite{XieGuo2000}：如果$L<\frac32+\sqrt{2}$，则存在反馈控制律使得系统\eqref{eq:Guo2}全局稳定；相反，若$L\geq\frac32+\sqrt{2}$，则不存在反馈控制律使得系统\eqref{eq:Guo2}全局稳定。$f(\cdot)$的绝对值随自变量$y_{k}$绝对值的增长速率决定了反馈机制能力的上限。
 
-上述这些现象在连续时间非线性系统中至今没有表现出来，这说明离散时间控制研究的必要性。这些“不可能性”（impossibility）定理表明了，在离散时间非线性系统的自适应控制中反馈机制存在极限。在随后的研究\upcite{Guo2002,ZhangGuo2002}中将这“不可能性”定理一推广到了高阶情形，其中$f(\cdot)$就推广到了多元函数，同样是满足Lipschitz条件。可以这样理解，如果$f(\cdot)$增长的比较快，那么就不存在使得系统\eqref{eq:Guo1}趋于稳定的自适应反馈控制律。分析出反馈机制的上下并给出数学证明，确实不是一件容易的事情。这一理论很直观地说明了系统的不确定性的大小常常表现为系统未知函数或者参数的变化剧烈程度，这些结论从控制稳定性和可行性的角度对系统的不确定性给出了一定的定量描述。
+上述这些现象在连续时间非线性系统中至今没有表现出来，这说明离散时间控制研究的必要性。这些“不可能性”（impossibility）定理表明了，在离散时间非线性系统的自适应控制中反馈机制存在极限。在随后的研究\upcite{Guo2002,ZhangGuo2002}中将这“不可能性”定理一推广到了高阶情形，其中$f(\cdot)$就推广到了多元函数，同样是满足Lipschitz条件。可以这样理解，如果$f(\cdot)$增长的比较快，那么就不存在使得系统\eqref{eq:Guo1}趋于稳定的自适应反馈控制律。分析出反馈机制的上下界并给出数学证明，确实不是一件容易的事情，需要极强的数学技巧。这一理论很直观地说明了系统的不确定性的大小常常表现为系统未知函数或者参数的变化剧烈程度，这些结论从控制稳定性和可行性的角度对系统的不确定性给出了一定的定量描述。
 
-目前关于反馈机制及能力的研究主要针对离散时间控制系统，这与离散时间控制器的广泛应用这一大趋势不谋而合，并且一开始就考虑到了非参数不确定性，因而具有较好的理论高度和普适性。反馈机制及能力给出了对不确定性系统的认识，从理论上看，不是所有的未知系统都可以设计出稳定的自适应控制律\upcite{Ma2008}；用但是同时也留下了一个问题：如果系统属于自适应反馈控制可稳定的范围内，那么如何设计出合适的自适应反馈控制律使系统达到满意的性能？一般来说，不同的被控对象自然结构和参数都不同，但是否存在一种较为通用的模型可以刻画大部分面对的被控对象？可以类比经典控制理论，毕竟线性系统和微分方程这些通用工具在几十年的控制理论中起到了关键的作用。类似这样的问题促进了半参数模型的提出。
+目前关于反馈机制及能力的研究主要针对离散时间控制系统\upcite{MaF2008}，这与离散时间控制器的广泛应用这一大趋势不谋而合，并且一开始就考虑到了非参数不确定性，因而具有较好的理论高度和普适性。反馈机制及能力给出了对不确定性系统的认识，从理论上看，不是所有的未知系统都可以设计出稳定的自适应控制律\upcite{Ma2008}；用但是同时也留下了一个问题：如果系统属于自适应反馈控制可稳定的范围内，那么如何设计出合适的自适应反馈控制律使系统达到满意的性能？一般来说，不同的被控对象自然结构和参数都不同，但是否存在一种较为通用的模型可以刻画大部分面对的被控对象？可以类比经典控制理论，毕竟线性系统和微分方程这些通用工具在几十年的控制理论中起到了关键的作用。类似这样的问题促进了半参数模型的提出。
 
 \section{半参数系统}\label{sect:2.2}
 \subsection{模型描述}\label{subsect:2.2.1}
 虽然数字化控制器输出到被控对象的信号是离散时间，但是实际的过程是连续时间变化的。一般的离散时间非线性控制往往忽略了这一点，就导致这些研究侧重于理论和离散时间仿真分析。再次考虑下面的NARX系统
 \begin{equation}%
 \label{eq:NARX2}
-y_{k+1} = f(y_{K},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_{k+1}
+y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_{k+1}
 \end{equation}
 在系统\eqref{eq:NARX2}中，把被控对象当成完全非线性模型，忽略了他们的线性特性，也就是说很多被控对象虽然具有较大的不确定性，但是在一定程度上是可以当作线性对象处理，只不过同时具有非线性部分，导致实际的线性部分参数与理论值有较大的偏差；对于不确定性系统，也就常常表现为同时具有参数不确定性和非参数不确定性。例如电机伺服系统简化处理就是一个二阶线性模型，一般的PID控制也可以获得还算不错的效果；只不过是在负载未知、快时变，或者一些难以建模的非线性动态特性如摩擦等严重的情况下，应用传统的PID控制电机伺服系统时，其效果才会大打折扣。
 
@@ -97,7 +97,7 @@ d_{2}=p_{2}+q_{2}
 
 \section{信息浓缩估计}\label{sect:2.3}
 \subsection{提出背景}\label{subsect:2.3.1}
-按照必然等价原理，为了控制系统\eqref{eq:semi-u}，需要辨识其中的未知参数向量$\bm{\theta}$。文献中已经存在很多经典的参数估计算法，例如递推最小二乘算法（RLS）、卡尔曼滤波（Kalman filter,KF）算法、最小均方算法（LMS）等。不过这些算法大部分都是基于线性系统建立的估计算法。由于系统存在非参数部分$f(\cdot)$，因此不能直接使用。实验数据\upcite{MaLum2009}表明，在非线性对象中盲目使用基于线性系统的参数估计算法会导致估计结果偏差较大。
+按照必然等价原理，为了控制系统\eqref{eq:semi-u}，需要辨识其中的未知参数向量$\bm{\theta}$。文献中已经存在很多经典的参数估计算法，例如递推最小二乘算法（Recursive Least Squares, RLS）、卡尔曼滤波（Kalman filter, KF）算法、最小均方算法（Least Mean Squares, LMS）等。不过这些算法大部分都是基于线性系统建立的估计算法。由于系统存在非参数部分$f(\cdot)$，因此不能直接使用。实验数据\upcite{MaLum2009}表明，在非线性对象中盲目使用基于线性系统的参数估计算法会导致估计结果偏差较大，特别是在强非线性系统中。
 
 被研究的系统\eqref{eq:semi-u}经常存在随机干扰。在系统辨识、信号处理、随机逼近、状态估计以及传统的自适应控制等领域中\upcite{Guo1992}，基于噪声或者干扰统计特性的参数估计算法应用十分广泛。随机干扰是系统的一种不确定性，为了描述和设计相应的参数估计算法，总是假设被研究的系统中的随机干扰符合某种统计特性。这是利用先验知识转化为可描述的数学关系的方法。本文在\ref{subsubsect:2.2.2.3}中也把统计特性作为先验知识的例子说明。事实上，随机干扰可能存在若干种来源，导致这些干扰或误差的概率分布（如果存在）并不符合模型假定的特性，最终使得这些估计算法在实际应用过程中失效。例如，如果对随机干扰的先验知识没有深入了解或测量，一种普遍的做法是假设其干扰服从某种高斯分布。这种做法在很多情况下确实有效，结果较为准确，但是对于有些情况可能就会偏离很远。为了使结果准确，可能需要调节高斯分布的方差等参数。
 
@@ -167,19 +167,19 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 \end{prop}
 
 命题\ref{thm:ic1}第三条的具体含义是：如果模型和相应的先验知识以及参与计算的数据是完全正确的，那么$C_{\infty}$必定是一个非空集合，并且满足真实的参数向量$\bm{\theta}\in C_{\infty}$，集合$C_{\infty}$的任意一个元素都可以匹配模型和数据；反过来，也成立。但是，如果$C_{\infty}=\varnothing$说明参与计算的数据、模型设置或者先验知识中某个部分存在问题，不是相对应的，那么就会导致结果出现偏差。这个充要条件一般来说比较容易满足的，可以把先验知识设定足够宽泛，并保证参与计算的数据都来源于真实的系统，至于野值的出现属于数据和信息预处理的问题，就不是本文要考虑的范畴了。
-\subsection{具体实施}\label{subsect:2.3.3}
+\subsection{实施框架}\label{subsect:2.3.3}
 从上面一小节\ref{subsect:2.3.2}关于信息浓缩估计器的描述和举例中，可以看出信息浓缩估计是一种在线实时估计器，充分利用了系统的先验知识和实时数据，因此也可以看作是一种数据驱动型的估计算法。随着采集到的数据不断增多，未知参数的不确定性就越来越小，我们对参数的估计就越来越准确。系统关于参数的先验知识不同，会导致信息集合$I_{k}$和信息浓缩之后的参数估计集合$C_{k}$不同，因而关于其中的递归运算\eqref{eq.Ck2}也就不同。
 
-有一种十分典型的情形，如同在上述的提出背景\ref{subsec:2.3.1}中描述的$z_{k}\in V_{k}$是区间的形式。具体数学描述为
+有一种十分典型的情形，如同在上述的提出背景\ref{subsect:2.3.1}中描述的$z_{k}\in V_{k}$是区间的形式。具体数学描述为
 \begin{eqnarray}%
 \underline{\theta}_{n}\leq\theta_{n}\leq\overline{\theta}_{n}\\
 \underline{z}\leq z_{k}\geq\overline{z}
 \end{eqnarray}
 这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\omega{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
 
-本节以及后面的章节也主要考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d_{1}=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。这里首先给出$d_{1}$为1时，$C_{k}$的推导过程。
+本节首先考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d_{1}=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。
 \subsubsection{一维参数情形}\label{subsubsect:2.3.3.1}
-当$d_{1}=1$时，$\theta$和$\phi_{k}$都是标量。由方程\eqref{eq.Ik}可知
+这里首先给出$d_{1}$为1时，$C_{k}$的推导过程。当$d_{1}=1$时，$\theta$和$\phi_{k}$都是标量。由方程\eqref{eq.Ik}可知
 \begin{equation}
 \label{eq.Ik.d1}
 I_{k}\triangleq\{\theta\in\Theta\colon \underline{z}\leq y_{k}-\phi_{k-1}\theta-u_{k-1}\leq\overline{z}\}
@@ -247,14 +247,14 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \end{split}
 \end{equation}
 
-从几何上看，方程组\eqref{eq.the.phi.d2}中的任意一个线性不等式的解，都代表着一个定义在域$\mathcal{R}^{d}$上的广义半平面。因此，通常来说，关于同一向量$\bm{\theta}$的多个线性不等式的解在在几何上表示为一个广义多边形或者多面体，仅需要找出这个多面体的顶点（向量）就可确定这个多面体。特别的，$d=2$时，多个方程组\eqref{eq.the.phi.d2}的解就是平面上的一个普通多边形，确定了这个多边形的顶点就等价于确定了参数满足的集合$C_{k}$。
+从几何上看，方程组\eqref{eq.the.phi.d2}中的任意一个线性不等式的解，都代表着一个定义在域$\mathcal{R}^{d}$上的广义半平面。因此，通常来说，关于同一向量$\bm{\theta}$的多个线性不等式的解在在几何上表示为一个广义多边形或者多面体，仅需要找出这个多面体的顶点（向量描述）就可确定这个多面体。特别的，$d=2$时，多个方程组\eqref{eq.the.phi.d2}的解就是平面上的一个普通多边形，确定了这个多边形的顶点就等价于确定了参数满足的集合$C_{k}$。
 
 记
 \begin{equation}%
 \label{eq.Vk}
 \beta_{k}=\{P_{n},n=1,2,\ldots,N_{k}\}
 \end{equation}
-为定义在区域$C_{k}$上的多面体顶点集合，其中$P_{n}$代表某个顶点，第$k$时刻集合$\beta_{k}$包含$N_{k}$个顶点。这里$\beta_{k}$记为一个多面体。下面先给出多维情形的一般公式。
+为定义在区域$C_{k}$上的多面体顶点集合，其中$P_{n}$代表某个顶点，第$k$时刻集合$\beta_{k}$包含$N_{k}$个顶点。这里$\beta_{k}$记为一个多面体。这里的顶点集情况是对于$d_{1}>2$时有意义。下面先给出多维情形的一般公式。
 
 由方程\eqref{eq.CkIk}可知，从约束条件来看，集合$C_{k}$比$C_{k-1}$多了一组不等式
 \begin{equation}%
@@ -302,109 +302,5 @@ e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 
 $d_{1}>2$时高维情形的情况类似，只是多边形变成了多面体，直线变成了广义半平面，由于多维情形不容易形象描述，此处就不再一一画出图形说明，留给读者自己想象。
 
-\subsection{算法实现}\label{subsect:2.3.4}
-如前所述，本文需要针对关联这种先验知识的系统设计信息浓缩估计器算法，其主要过程和难点在于，如何在前一时刻的顶点集的基础上，结合这一时刻得到的输入输出约束关系，得到这一时刻的顶点集，也就确定了当前时刻的参数集。这里的顶点集情况是对于$d_{1}>2$时有意义。当$d_{1}=1$时不涉及顶点集的组合，情况比较简单，上面第\ref{subsubsect:2.3.3.1}已经给出具体计算步骤。
-
-二维情形下主要是考虑直线和多边形的位置关系。图\ref{fig.2d.export}展示了直线和多边形位置关系的一种可能的例子，从这个图中可以知道求解这个顶点集涉及到计算几何的知识，需要全面考虑各种情形。如图\ref{fig.poly.l}所示。
-\begin{figure}
-	\centering
-	\subfigure[情形1.1]{	 % Caption of subfigure in []
-	\label{fig.poly.1.1}	 % Label of subfigure in {}
-	\includegraphics[width=0.45\textwidth ]{ch2-poly-00.png}}
-	\subfigure[情形1.2]{
-	\label{fig.poly.1.2}
-	\includegraphics[width=0.45\textwidth ]{ch2-poly-01.png}}
-	\subfigure[情形2.1]{	 % Caption of subfigure in []
-	\label{fig.poly.2.1}	 % Label of subfigure in {}
-	\includegraphics[width=0.45\textwidth ]{ch2-poly-10.png}}
-	\subfigure[情形2.2]{
-	\label{fig.poly.2.2}
-	\includegraphics[width=0.45\textwidth ]{ch2-poly-11.png}}
-	\subfigure[情形3.1]{	 % Caption of subfigure in []
-	\label{fig.poly.3.1}	 % Label of subfigure in {}
-	\includegraphics[width=0.45\textwidth ]{ch2-poly-20.png}}
-	\subfigure[情形3.2]{
-	\label{fig.poly.3.2}
-	\includegraphics[width=0.45\textwidth ]{ch2-poly-21.png}}
-	\caption{直线和多边形位置关系}	 % Caption of figure
-	\label{fig.poly.l}	 % Label of figure
-\end{figure}
-
-为了叙述方便，本小节关于时刻$k$的下标省略。$d_{1}=2$时，信息浓缩过程的映射关系$G(\beta,\bm{\phi},e)$可以记为
-\begin{equation}%
-\mathbf{AddLinear2D}\colon \beta\rightarrow\beta'
-\end{equation}
-这里$\beta$和$\beta'$分别表示两个不同的多边形，其顶点集合表示（按顺时针排列，下同）为
-\begin{equation*}%
-\begin{split}%
-\beta&=\{P_{1},P_{2},\ldots,P_{N}\\
-\beta'&=\{P_{1}',P_{2}',\ldots,P_{N'}'\}
-\end{split}
-\end{equation*}
-
-本文设计了$d_{1}=2$时多边形顶点变换$G$的计算几何算法，具体过程见算法\ref{alg.ic.2d}。
-
-\begin{algo}%
-\caption{$d_{1}=2$时多边形顶点变换$G$}
-\label{alg.ic.2d}
-\begin{algorithmic}
-\REQUIRE\\
-$\beta$: 顶点集$\{P_{1},P_{2},\ldots,P_{N}\}$\\
-\ENSURE
-$\beta'$：顶点集$\{P_{1}',P_{2}',\ldots,P_{N'}'\}$\\
-\STATE Denote the number of vertices in $\beta$ by $N$
-\FOR{$j=1$ to $N$}
-	\STATE Denote the $jth$ vertex by $P_{j}$
-	\STATE Let $F_{j}=\mathbf{sgn}(c-\phi^{T}P_{j})$
-\ENDFOR
-\IF{$F_{j}\geq0\ \forall 1\leq j\leq n$}
-	\STATE $\beta'\leftarrow\beta$ and return
-\ELSIF{$F_{j}<0\ \forall 1\leq j\leq n$}
-	\STATE $\beta\leftarrow\emptyset$ and return
-\ENDIF
-\FOR{$j=2$ to $N-1$}
-    \IF{($P_{j}$ and $P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j}$ and $P_{j+1}$ are in different sides)}
-		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
-		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
-		\IF {($F_{j}>0$)}
-			\STATE$\beta'=\{P_{1}^{i},P_{j},P_{2}^{i}\}$
-		\ELSE
-			\STATE$\beta'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
-		\ENDIF
-        \STATE break
-    \ELSIF{($P_{j},P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j+1},\ldots,P_{j+a-1}$ are on the same side) $\bigwedge$ 
-		($P_{j+a-1},P_{j+a}$ are on different sides)}
-		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
-		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+a-1}P_{j+a}}$.
-		\IF {($F_{j}>0$)}
-			\STATE$\beta'=\{P_{1}^{i},P_{j},\ldots,P_{j+a-1},P_{2}^{i}\}$
-		\ELSE
-			\STATE$\beta'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+a},\ldots,P_{n}\}$
-		\ENDIF
-        \STATE break
-	\ELSIF{($P_{j},P_{j+1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j-1},\ldots,P_{j-b+1}$ are on the same side) $\bigwedge$ 
-	($P_{j-b+1},P_{j-b}$ are on different sides)}
-		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-b+1}P_{j-b}}$
-		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
-		\IF {($F_{j}>0$)}
-			\STATE$\beta'=\{P_{1}^{i},P_{j-b+1},\ldots,P_{j},P_{2}^{i}\}$
-		\ELSE
-			\STATE$\beta'=\{P_{1},\ldots,P_{j-b},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
-		\ENDIF
-        \STATE break
-    \ENDIF
-	\STATE $j\leftarrow j+1$
-\ENDFOR
-\STATE return $\beta'$
-\end{algorithmic}
-\end{algo}
-\subsection{仿真实例}\label{subset:2.3.5}
-仿真曲线如图\ref{fig.2d.theta}所示。
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth ]{ch-2d-theta.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
-	\caption{$d_{1}=2$时信息浓缩估计参数估计结果}
-	\label{fig.2d.theta}
-\end{figure}
-\subsection{主要特点}
-半参数自适应控制给出了一种新的理论框架，解决两种不确定性同时出现的系统。现有的半参数自适应控制实现了一维情形下的参数估计算法，但二阶及其以上的参数估计并未具体实现，这涉及计算几何的知识。因此设计高阶情形下基于信息浓缩思想的参数估计算法是实现半参数自适应控制的前提。
+\section{本章总结}
+本章的主要内容是半参数系统和信息浓缩估计的基本思想。首先由关于已有的反馈机制能力极限的探索引出存在的不确定性系统的自适应控制问题；然后从实际问题抽象出半参数系统的基本模型，介绍了相关的先验知识举例；接着介绍了一种基于集合的参数估计算法即所谓的信息浓缩估计的主要思想；最后针对典型系统介绍了信息浓缩估计的具体实施框架。
