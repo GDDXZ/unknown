@@ -4,7 +4,7 @@
 %% last update: Nov 8th, 2017
 %%==================================================
 \chapter{二维参数的信息浓缩估计算法}\label{chap:3}
-上面一章介绍了半参数系统中的信息浓缩估计方法，从相关的定理\ref{thm:ic1}可知不同的先验知识会导致信息集合$I_{k}$的形式不同。而从其实施框架可知，一维情形由于只有一个参数不涉及顶点集的组合，因而具体算法比较容易实现，上面第\ref{subsubsect:2.3.3.1}已经给出具体计算步骤。但是实际情况往往不只有一个参数，因而需要设计多维情形的估计算法。多维情形的算法如果直接通过代数推导，不容易解决，需要借助计算几何的思想。在线性控制理论和单变量系统中，两个参数的情况十分常见。因此本章针对两个参数即$d_{1}=2$的情形，设计信息浓缩估计器的具体算法。
+上面一章介绍了半参数系统中的信息浓缩估计方法，从相关的定理\ref{thm:ic1}可知不同的先验知识会导致信息集合$I_{k}$的形式不同。一维情形由于只有一个参数不涉及顶点集的组合，因而具体算法比较容易实现，上面第\ref{subsubsect:2.3.3.1}已经给出具体计算步骤。但是实际情况往往不只有一个参数，因而需要设计多维情形的估计算法，第\ref{subsubsect:2.3.3.2}小节给出了实施框架。多维情形的算法如果直接通过代数推导，不容易解决，需要借助计算几何的思想。在线性控制理论和单变量系统中，两个参数的情况十分常见。因此本章针对两个参数即$d_{1}=2$的情形，设计信息浓缩估计器的具体算法。
 \section{问题描述}\label{sect:3.1}
 在第二章的基础上，本章继续考虑上下界这种典型的先验知识。如前所述，需要针对关联这种先验知识的系统设计信息浓缩估计算法，完整的过程主要以下分为两步：
 \begin{enumerate}
@@ -12,12 +12,12 @@
 \item 选定合适值。根据一定的法则，从上述的参数集合中选择合适的估计值作为这个时刻的参数估计值参与控制律等后续的计算。
 \end{enumerate}
 
-第一步的具体操作是，在某个确定时刻得到的一组输入输出数据可以确定两个线性约束不等式，将这个两个约束先后加入到之前时刻的顶点集合中，得到这一时刻的顶点集合，也就确定了当前时刻的参数集合。从理论上说，第一步得到的参数集合中的每一个值都可以作为这个时刻的估计值，但是控制律等后续计算往往需要一个具体的值，所以需要按照一定的法则从集合中确定一个最优值，一般选择多边形的中心作为这个时刻的估计值。上面的两步中，第一步信息浓缩是难点。因此，本章的重点在于第一步的算法设计。一个时刻的信息浓缩过程包含两组约束关系的先后加入，也就是两次$G$变换。这两次的变换过程一样，只是每次的数据不一样，故这里只需要考虑一次变换。另外，为了叙述方便，本章关于时刻$k$的下标省略。
+第一步的具体操作是在某个确定时刻，得到一组输入输出数据，可以确定两个线性约束不等式，将这个两个约束先后加入到之前时刻的顶点集合中，得到这一时刻的顶点集合，也就确定了当前时刻的参数集合。从理论上说，第一步得到的参数集合中的每一个值都可以作为这个时刻的估计值，但是控制律等后续计算往往需要一个具体的值，所以需要按照一定的法则从集合中确定一个最优值，一般选择多边形的中心作为这个时刻的估计值。上面的两步中，第一步信息浓缩是难点。因此，本章的重点在于第一步的算法设计。一个时刻的信息浓缩过程包含两组约束关系的先后加入，也就是两次$G$变换。这两次的变换过程一样，只是每次的数据不一样，故这里只需要考虑一次变换。另外，为了叙述方便，本章关于时刻$k$的下标省略。
 
 $d_{1}=2$时，用$\beta$和$\beta'$分别表示两个不同的多边形，其顶点集合表示（按顺时针排列，下同）为
 \begin{equation*}%
 \begin{split}%
-\beta&=\{P_{1},P_{2},\ldots,P_{N}\\
+\beta&=\{P_{1},P_{2},\ldots,P_{N}\}\\
 \beta'&=\{P_{1}',P_{2}',\ldots,P_{N'}'\}
 \end{split}
 \end{equation*}
@@ -28,27 +28,40 @@ $d_{1}=2$时，关于未知参数$\bm{\theta}$的约束不等式为
 \end{equation}
 这里$\bm{\phi}$和$\bm{\theta}$都是二维向量，$\bm{\phi}$和$e$都可以由输入输出组合得到，$\bm{\theta}$是这个不等式的未知变量。
 
-因此，映射关系$G(\beta,\bm{\phi},e)$可以记为
+因此，变换$G(\beta,\bm{\phi},e)$可以记为映射
 \begin{equation}%
 \mathbf{AddLinear2D}\colon \beta\rightarrow\beta'
 \end{equation}
 这就是二维参数的信息浓缩估计算法需要解决的核心部分。
 
 \section{几何关系分析}\label{sect:3.2}
-记两元组$L=(\phi,e)$表示一条直线。二维情形下主要是考虑同一个平面内，直线和多边形的位置关系。图\ref{fig.2d.export}展示了直线和多边形位置关系的一种可能的例子，从这个图中可以知道求解这个顶点集涉及到计算几何的知识，需要全面考虑各种情形。具体来看，分析一条直线和多边形位置关系，就是考察多边形中每个顶点和直线的位置关系。
+二维情形下主要是考虑同一个平面内，直线和多边形的位置关系。图\ref{fig.2d.export}展示了直线和多边形位置关系的一种可能的例子，从这个图中可以知道求解这个顶点集涉及到计算几何的知识，需要全面考虑各种情形。具体来看，分析一条直线和多边形的位置关系，就是考察多边形中每个顶点和直线的位置关系。单个顶点和直线的位置关系主要涉及平面解析几何的知识。
+
+$d_{1}=2$时，$\bm{\phi}^{T}\cdot\bm{\theta}=e$表示一条直线$L$，它将整个平面分成两个半平面。用二元组
+$$L_{c}=(\bm{\phi},\bm{\theta})$$
+表示不等式约束关系
+\begin{equation}\label{eq.3.neq}
+\bm{\phi}^{T}\cdot\bm{\theta}\leq e
+\end{equation}
+在几何上，$L_{c}$也可以被认为是一个半平面。
 
 记
-$$\bm{\phi}^{T}=[\phi_{1},\phi_{2}]$$，
+$$\bm{\phi}^{T}=[\phi_{1},\phi_{2}]$$
 顶点$P_{n}$的坐标为
-\begin{equation*}
-P_{n}\colon (X_{P_{n}},Y_{P_{n}})
-\end{equation*}
-则顶点$P_{n}$和直线$L$的位置关系可以由下面的不等式确定
+$$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
+分别对应于待估计参数向量$\bm{\theta}$的第一个分量和第二个分量。
+
+顶点$P_{n}$和直线$L$的位置关系可以由下面的不等式确定
 \begin{equation}\label{eq.3.L.P}
-\bm{\phi}^{T}\leq e
+\phi_{1}X_{P_{n}}+\phi_{2}Y_{P_{n}}\leq e
 \end{equation}
 
-\begin{figure}
+如果不等式\eqref{eq.3.L.P}成立，则顶点$P_{n}$满足约束关系\eqref{eq.3.neq}，即在半平面$L_{c}$内。根据不等式\eqref{eq.3.L.P}可以确定多边形$\beta$的所有顶点和直线$L$的位置关系，从而判断出这个多边形和直线的位置关系。
+
+经过分析，根据各个顶点和直线的分布情况，可以将多边形和直线的位置关系分为三类。
+\begin{enumerate}
+\item 多边形顶点在直线的同一侧，则多边形和直线没有交点，如图\ref{fig.3.beta.l.1}所示又可具体分为两种情况。第一种情况\ref{fig.poly.1.1}，多边形不变，即$\beta'=\beta$；第二种情况\ref{fig.poly.1.2}，一般是在数据出错的情况下才会发生（在定理\eqref{thm:ic1}已经指出），此时$\beta'=\varnothing$，算法停止。
+\begin{figure}[htp]
 	\centering
 	\subfigure[情形1.1]{	 % Caption of subfigure in []
 	\label{fig.poly.1.1}	 % Label of subfigure in {}
@@ -56,23 +69,34 @@ P_{n}\colon (X_{P_{n}},Y_{P_{n}})
 	\subfigure[情形1.2]{
 	\label{fig.poly.1.2}
 	\includegraphics[width=0.45\textwidth ]{ch2-poly-01.png}}
+	\caption{直线和多边形位置关系的第一类情形}	 % Caption of figure
+	\label{fig.3.beta.l.1}	 % Label of figure
+\end{figure}
+\item 多边形只有一个顶点和其他顶点不在直线的同一侧，如图\ref{fig.3.beta.l.2}所示又可具体分为两种情况。第一种情况\ref{fig.poly.2.1}，只有一个顶点不满足约束，多边形顶点个数加1；第二种情况\ref{fig.poly.2.2}，只有一个顶点满足约束，多边形变成一个三角形。
+\begin{figure}[htp]
+	\centering
 	\subfigure[情形2.1]{	 % Caption of subfigure in []
 	\label{fig.poly.2.1}	 % Label of subfigure in {}
 	\includegraphics[width=0.45\textwidth ]{ch2-poly-10.png}}
 	\subfigure[情形2.2]{
 	\label{fig.poly.2.2}
 	\includegraphics[width=0.45\textwidth ]{ch2-poly-11.png}}
+	\caption{直线和多边形位置关系的第二类情形}	 % Caption of figure
+	\label{fig.3.beta.l.2}	 % Label of figure
+\end{figure}
+\item 多边形有至少两个顶点和其他顶点不在直线的同一侧，如图\ref{fig.3.beta.l.2}所示又可具体分为两种情况。图\ref{fig.poly.3.1}和\ref{fig.poly.3.2}是两种对立的情形，事先都无法准确知道剩余的顶点个数，只能根据实际情况确定。
+\begin{figure}[htp]
+	\centering
 	\subfigure[情形3.1]{	 % Caption of subfigure in []
 	\label{fig.poly.3.1}	 % Label of subfigure in {}
 	\includegraphics[width=0.45\textwidth ]{ch2-poly-20.png}}
 	\subfigure[情形3.2]{
 	\label{fig.poly.3.2}
 	\includegraphics[width=0.45\textwidth ]{ch2-poly-21.png}}
-	\caption{直线和多边形位置关系}	 % Caption of figure
-	\label{fig.poly.l}	 % Label of figure
+	\caption{直线和多边形位置关系的第三类情形}	 % Caption of figure
+	\label{fig.3.beta.l.3}	 % Label of figure
 \end{figure}
-
-如图\ref{fig.poly.l}所示。
+\end{enumerate}
 
 \section{算法实现}\label{sect:3.3}
 本章设计了$d_{1}=2$时多边形顶点变换$G$的计算几何算法，具体过程见算法\ref{alg.ic.2d}。

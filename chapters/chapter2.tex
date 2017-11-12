@@ -167,7 +167,7 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 \end{prop}
 
 命题\ref{thm:ic1}第三条的具体含义是：如果模型和相应的先验知识以及参与计算的数据是完全正确的，那么$C_{\infty}$必定是一个非空集合，并且满足真实的参数向量$\bm{\theta}\in C_{\infty}$，集合$C_{\infty}$的任意一个元素都可以匹配模型和数据；反过来，也成立。但是，如果$C_{\infty}=\varnothing$说明参与计算的数据、模型设置或者先验知识中某个部分存在问题，不是相对应的，那么就会导致结果出现偏差。这个充要条件一般来说比较容易满足的，可以把先验知识设定足够宽泛，并保证参与计算的数据都来源于真实的系统，至于野值的出现属于数据和信息预处理的问题，就不是本文要考虑的范畴了。
-\subsection{实施框架}\label{subsect:2.3.3}
+\subsection{典型实现}\label{subsect:2.3.3}
 从上面一小节\ref{subsect:2.3.2}关于信息浓缩估计器的描述和举例中，可以看出信息浓缩估计是一种在线实时估计器，充分利用了系统的先验知识和实时数据，因此也可以看作是一种数据驱动型的估计算法。随着采集到的数据不断增多，未知参数的不确定性就越来越小，我们对参数的估计就越来越准确。系统关于参数的先验知识不同，会导致信息集合$I_{k}$和信息浓缩之后的参数估计集合$C_{k}$不同，因而关于其中的递归运算\eqref{eq.Ck2}也就不同。
 
 有一种十分典型的情形，如同在上述的提出背景\ref{subsect:2.3.1}中描述的$z_{k}\in V_{k}$是区间的形式。具体数学描述为
@@ -178,7 +178,7 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\omega{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
 
 本节首先考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d_{1}=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。
-\subsubsection{一维参数情形}\label{subsubsect:2.3.3.1}
+\subsubsection{一维参数算法}\label{subsubsect:2.3.3.1}
 这里首先给出$d_{1}$为1时，$C_{k}$的推导过程。当$d_{1}=1$时，$\theta$和$\phi_{k}$都是标量。由方程\eqref{eq.Ik}可知
 \begin{equation}
 \label{eq.Ik.d1}
@@ -285,13 +285,13 @@ e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 \begin{equation}%
 \{P_{1},P_{2},P_{3},P_{4},P_{5}\}
 \end{equation}
-围成的多边形，加入线性约束条件$L$之后，变成了顶点集
+围成的多边形，加入线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq e$之后，变成了顶点集
 \begin{equation}%
 \{P_{1}',P_{2}',P_{3},P_{4},P_{5}\}
 \end{equation}
 围成的多边形（深色部分）。
 
-\begin{figure}
+\begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.5\textwidth ]{ch2-2d-export.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
 	\caption{$d_{1}=2$时，信息浓缩$G$变换过程的几何解释}
