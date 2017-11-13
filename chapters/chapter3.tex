@@ -101,7 +101,7 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \section{算法实现}\label{sect:3.3}
 根据上节关于多边形和直线的几何位置关系的分析和总结，本节设计了$d_{1}=2$时多边形顶点集变换$\mathbf{AddLinear2D}$的计算几何算法。
 
-首先用一个数组记录顶点$P_{n}$和约束$L_{c}$的位置关系，即
+需要遍历多边形的所有顶点与多边形的位置关系。可以用一个数组记录顶点$P_{n}$和约束$L_{c}$的位置关系，即
 \begin{equation}%
 \mathbf{Flag}(n)=\left\{
 \begin{aligned}%
@@ -111,8 +111,8 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \end{equation}
 这里，$n=1,2,\ldots,N$。
 
-然后根据上节的位置关系结果，可以设计算法的流程图如图\ref{fig.3.ic.flow}所示。
-\begin{figure}[!htb]
+根据上节的位置关系结果，可以设计算法的流程图如图\ref{fig.3.ic.flow}所示。
+\begin{figure}[htb]
  \centering
  \includegraphics[width=0.9\textwidth ]{ch3-lc-flow.pdf}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
  \caption{$\mathbf{AddLinear2D}$的算法流程图}
@@ -181,10 +181,10 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \end{split}
 \end{equation}
 
-本节设计的算法\ref{alg.ic.2d}和方程\eqref{eq.3.theta}就是$d_{1}=2$时完整的信息浓缩估计算法。
+本节设计的算法\ref{alg.ic.2d}和方程\eqref{eq.3.theta}就是$d_{1}=2$时完整的信息浓缩估计算法，可以用于后续的控制器设计。
 
 \section{仿真实例}\label{sect:3.4}
-本节在实际的被控对象中仿真上面设计的信息浓缩估计算法。选择如下的被控对象
+为了验证本章设计算法的有效性，本节在实际的被控对象中仿真上面设计的信息浓缩估计算法。选择如下的被控对象
 \begin{equation}
 \label{eq.3.sys.eq}
 y_{k+1}=\theta_{1}\cdot y_{k} +\theta_{2}\cdot y_{k-1}+u_{k}+\omega_{k+1}+\sin(\frac{k}2)
@@ -197,11 +197,28 @@ y_{k+1}=\theta_{1}\cdot y_{k} +\theta_{2}\cdot y_{k-1}+u_{k}+\omega_{k+1}+\sin(\
 \begin{equation*}
 0\leq\omega_{k}\leq1
 \end{equation*}
-为了便于计算，令$u_{k}=0$。在本节中，为了更加符号实际情况，在计算时，将随机干扰的上下界范围扩大，取为
+而非线性部分是三角函数，其上下界为
+\begin{equation*}
+-1\leq\sin(\frac{k}2)\leq1
+\end{equation*}
+
+为了便于计算，令$u_{k}=0$。在本节中，为了更加符合实际情况，在计算时，将随机干扰和非线性的上下界范围扩大，分别取为
 \begin{equation*}
 -1\leq\omega_{k}\leq2
 \end{equation*}
-初始的参数集合为
+和
+\begin{equation*}
+-2\leq\sin(\frac{k}2)\leq2
+\end{equation*}
+因此，合并得到
+\begin{equation*}
+\begin{split}%
+&\underline{z}=-3\\
+\overline{z}=4
+\end{split}
+\end{equation*}
+
+初始的参数集合取为
 \begin{equation*}%
 \Theta=\{-1\leq\theta_{1}\leq1,\ -1\leq\theta_{2}\leq1\}
 \end{equation*}
@@ -268,4 +285,4 @@ C_{\infty}=\bigcap\limits_{k=1}^{\infty} C_{k}\subseteq \hat{C}_{\infty}
 虽然存在诸如此类的缺点，但信息浓缩估计算法仍然提供了很好的辨识思路和较好的收敛性和精确度，值得深入研究和进一步优化。
 
 \section{本章总结}
-本章主要讨论了信息浓缩估计算法的具体实现。首先描述了二维参数情形下，信息浓缩估计算法的具体步骤和基本问题；然后对信息浓缩变换中的直线和多边形几何关系进行了详细地分析，并设计了信息浓缩变换的算法流程图，并给出了具体的伪代码实现；接着在实际的被控对象中仿真前面设计的信息浓缩估计算法，给出了估计结果；最后讨论了信息浓缩估计的计算优化问题，并总结了信息浓缩估计的主要优缺点。
+本章主要讨论了信息浓缩估计算法的具体实现。首先描述了二维参数情形下，信息浓缩估计算法的主要步骤和基本问题；然后对信息浓缩变换中直线和多边形的几何关系进行了详细地分析，同时设计了信息浓缩变换的算法流程图，并给出了具体的伪代码实现；接着在实际的被控对象中仿真前面设计的信息浓缩估计算法，给出了最终估计结果和过程曲线；最后讨论了信息浓缩估计的计算复杂度优化问题，总结了信息浓缩估计的主要优缺点。

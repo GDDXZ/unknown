@@ -4,6 +4,7 @@
 %% last update: Nov 8th, 2017
 %%==================================================
 \chapter{半参数系统与信息浓缩估计}\label{chap:2}
+
 传统鲁棒控制主要考虑小范围的结构不确定性，传统自适应控制主要考虑系统的参数不确定性，而一般的非线性自适应控制直接考虑非线性模型从而设计复杂的控制器。实际问题中参数不确定性和较大的结构不确定性可同时出现，因此这些方法对于解决非线性不确定性被控对象的离散时间控制问题都存在一定的局限性。所有的被控对象本质上都是非线性的，但是线性控制方法在反馈控制前期发展中起到了很大作用。这不由得让人思考，是否很多非线性对象都存在一个起主要作用的线性模型？按照这个思路，虽然无法精确的已知非线性不确定性系统的离散化模型，但是这些非线性系统可以用一个线性模型（如ARX模型）加上一个非线性部分（关于输入输出数据的未知函数）近似，也就是把系统的不确定性分为参数和非参数不确定性。为了解决控制问题，需要先辨识参数部分。这就是本章要介绍的半参数系统和所谓的信息浓缩（information concentration estimate, IC）估计。
 
 \section{反馈机制能力极限的探索}\label{sect:2.1}
@@ -39,7 +40,7 @@ y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 首先考虑如下一类半参数模型
 \begin{equation}%
 \label{eq:semi-u}
-y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1}
+y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1}
 \end{equation}
 其中，$y_{k}$，$u_{k}$分别表示系统在$k$时刻的输出和输入，由它们的历史数据组成的回归向量$\bm{\phi_{k}}$和$\bm{\psi_{k}}$具体定义如下:
 \begin{eqnarray}
@@ -112,14 +113,14 @@ d_{2}=p_{2}+q_{2}
 下面基于数学语言详细解释息浓缩估计器的具体思路。这里再次考虑系统
 \begin{equation}%
 \label{eq:semi-u2}
-y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{x_{k}})+\omega_{k+1},
+y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1},
 \end{equation}
 并记
 \begin{eqnarray}
 \label{eq:zk}
 \begin{split}%
-z_{k} & = f(\phi_{k}) + \omega_{k+1}\\
-& = y_{k}-\phi_{k-1}^{T}\theta-u_{k-1}
+z_{k} & = f(\psi_{k}) + \omega_{k+1}\\
+& = y_{k}-\psi_{k-1}^{T}\theta-u_{k-1}
 \end{split}
 \end{eqnarray}
 
