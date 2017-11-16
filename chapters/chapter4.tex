@@ -25,10 +25,69 @@ u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{T}\cdot\hat{\bm{\theta}}_{k}-\breve{z}_{k}
 
 非线性部分的辨识与控制器的设计是本章重点解决的问题。
 
-\section{非线性估计}\label{sect:4.2}
+\section{非参数部分的估计}\label{sect:4.2}
 
 \subsection{最近邻估计}
-前面的章节用信息浓缩估计解决了参数不确定性的辨识问题，半参数自适应控制在提出来的时候，针对非参数部分使用的是最近邻估计。
+前面的章节用信息浓缩估计解决了参数不确定性的辨识问题，半参数自适应控制在提出来的时候，针对非参数部分使用的是最近邻估计。最近邻估计主要针对的是一维参数情形（$d_{1}=1$且$d_{2}=1$），即下面的一维半参数系统
+\begin{equation}%
+\label{eq:4.1ord}
+y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\omega_{k+1}
+\end{equation}
+这里，标量$\theta$是未知的，为参数不确定性部分，同样$f(\cdot)$是非参数不确定性部分，满足liptsz条件。最近邻估计不显示地估计$f(\cdot)$部分，而是直接估计
+\begin{equation}\label{eq:4.nne.g}
+g_{k} = \theta y_{k}+f(y_{k})
+\end{equation}
+这个整体。这样，在用信息浓缩算法估计出参数$\theta$之后，移除这个估计值$\hat{\theta}$，就可以获得非参数部分的估计。
+
+在系统\eqref{eq:4.1ord}中，由于liptsz条件的存在，不管是非参数部分还是参数部分都主要和输出值$y_{k}$相关，这样输出值$y_{k}$相近的时刻，那么$g_{k}$的值也应该相差不大。因此最近邻估计就主要利用到了这一点，其主要思想在于寻找和当前时刻输出值$y_{k}$最相近的时刻，然后进行比较计算。
+
+首先定义最近邻时刻为
+\begin{equation}\label{eq:4.it}
+i_k=\mathop{\arg \min}\limits_{i<k}|y_k-y_i|
+\end{equation}
+$i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等式成立
+\begin{equation*}
+\begin{array}{lll}
+&g_k&=g_k-z_{i_k}+z_{i_k}\\
+&&=[\theta y_k+f(y_k)]-[\theta y_{i_k}+f(y_{i_k})+w_{i_k+1}]+z_{i_k}\\
+&&=[\theta(y_k-y_{i_k})+z_{i_k}]+[f(y_k)-f(y_{i_k})-w_{i_k+1}]
+\end{array}
+\end{equation*}
+一般来说，上面等式中的最后一行中$f(y_k)-f(y_{i_k})$的值接近零，并且干扰项比较小。因此，可以取整体表达式\eqref{eq:4.nne.g}的估计为
+\begin{equation}\label{eq.4:g.est}
+\begin{array}{lll}
+\hat{g}_k&\triangleq\hat{\theta}_k(y_t-y_{i_k})+z_{i_k}
+&=\hat{\theta_k}(y_k-y_{i_k})+(y_{i_k+1}-u_{i_k})
+\end{array}
+\end{equation}
+
+接着，令
+\begin{equation}\label{eq.4:bk}
+\begin{array}{lll}
+\bar{b}_k\triangleq \max\limits_{i\leq k}y_i
+         =\max(\bar{b}_{k-1}, y_k)\\
+\underline{b}_k\triangleq \min\limits_{i\leq k}{y_i}
+                =\min(\underline{b}_{k-1}, y_k).
+\end{array} 
+\end{equation}
+
+最后基于设计出下面的控制律
+\begin{equation}\label{eq:4.uk}
+u_{t}=\left\{
+\begin{array}{cc}
+  -\hat g_k+y_{k+1}^* & \text{if } |y_k-y_{i_k}|\le D \\
+  -\hat g_k+\frac12(\bar b_k+\underline b_k) & \text{if } |y_k-y_{i_k}|> D \\
+\end{array}
+\right.
+\end{equation}
+这里，$D$是一个合适的常数值。
+
+由此看出，最近邻估计可以比较准确地给出一维情形下非参数部分的估计，从而解决半参数系统的自适应控制问题。但是有一定的局限性，主要体现在：
+\begin{enumerate}
+\item 由于最近邻时刻$i_k$的计算需要遍历所有的历史值，因此，随着时间无限增长，理论上需要无限的内存用来存储历史数据。这个实施带来了困难。
+\item 由于在计算$\hat{g}_k$时没有对干扰值作特别处理，因此适用于干扰值的有界范围比较小且变化比较慢的系统。
+\item 没有充分利用历史数据和关联先验信息，只是利用最近邻时刻的数据，计算结果不一定是最优的。
+\end{enumerate}
 
 \subsection{BP与ELM}
 
