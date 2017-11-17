@@ -253,9 +253,9 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 记
 \begin{equation}%
 \label{eq.Vk}
-\beta_{k}=\{P_{n},n=1,2,\ldots,N_{k}\}
+\Gamma_{k}=\{P_{n},n=1,2,\ldots,N_{k}\}
 \end{equation}
-为定义在区域$C_{k}$上的多面体顶点集合，其中$P_{n}$代表某个顶点，第$k$时刻集合$\beta_{k}$包含$N_{k}$个顶点。这里$\beta_{k}$记为一个多面体。这里的顶点集情况是对于$d_{1}>2$时有意义。下面先给出多维情形的一般公式。
+为定义在区域$C_{k}$上的多面体顶点集合，其中$P_{n}$代表某个顶点，第$k$时刻集合$\Gamma_{k}$包含$N_{k}$个顶点。这里$\Gamma_{k}$记为一个多面体。这里的顶点集情况是对于$d_{1}>2$时有意义。下面先给出多维情形的一般公式。
 
 由方程\eqref{eq.CkIk}可知，从约束条件来看，集合$C_{k}$比$C_{k-1}$多了一组不等式
 \begin{equation}%
@@ -276,11 +276,11 @@ e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 本文称\eqref{eq.nq.d2}为线性约束。和$d_{1}=1$情形类似，可以得到信息约束的递推形式为
 \begin{equation}%
 \begin{split}%
-\beta_{k-1}'&=G(\beta_{k-1},\bm{\phi_{k-1}},e_{k,1})\\
-\beta_{k}&=G(\beta_{k-1}',\bm{\phi_{k-1}},e_{k,2})
+\Gamma_{k-1}'&=G(\Gamma_{k-1},\bm{\phi_{k-1}},e_{k,1})\\
+\Gamma_{k}&=G(\Gamma_{k-1}',\bm{\phi_{k-1}},e_{k,2})
 \end{split}
 \end{equation}
-这里$G(\beta,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\beta$中加入一个线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq e$。
+这里$G(\Gamma,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\Gamma$中加入一个线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq e$。
 
 图\ref{fig.2d.export}展示了$d_{1}=2$时$G$变换的过程。图中，原有的参数区域是由顶点集
 \begin{equation}%
