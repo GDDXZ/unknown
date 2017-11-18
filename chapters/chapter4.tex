@@ -56,7 +56,7 @@ $i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等
 一般来说，上面等式中的最后一行中$f(y_k)-f(y_{i_k})$的值接近零，并且干扰项比较小。因此，可以取整体表达式\eqref{eq:4.nne.g}的估计为
 \begin{equation}\label{eq.4:g.est}
 \begin{array}{lll}
-\hat{g}_k&\triangleq\hat{\theta}_k(y_t-y_{i_k})+z_{i_k}
+\hat{\eta}_k&\triangleq\hat{\theta}_k(y_t-y_{i_k})+z_{i_k}
 &=\hat{\theta_k}(y_k-y_{i_k})+(y_{i_k+1}-u_{i_k})
 \end{array}
 \end{equation}
@@ -94,22 +94,28 @@ u_{t}=\left\{
 \subsection{神经网络}
 机器学习解决的问题从数学上主要分为分类和回归。其中分类处理的数据主要是离散型数据，回归解决的对象和思路跟控制中的估计、预测十分类似。而神经网络作为一种十分有效的回归与预测算法，在非线性辨识中应用十分广泛。神经网络主要由输入层、隐含层和输出层组成（最简单的神经网络可能没有隐含层），依据不同的激活函数或者不同的学习算法，种类十分丰富。本章主要讨论一种十分常见的单隐层前馈神经网络（Single hidden layer feedforwar network, SLFN），即具有一个输入层、一个隐含层以及一个输出层的前馈型神经网络。
 
-一个具有$N_{I}$个输入神经元、$N_{O}$个输出神经元以及$N_{H}$个隐含层神经元的单隐层前馈神经网络的激活函数为
-$g(\cdot)$。假设存在任意$N_{s}$个不同的输入输出样本对
-$$\{\bm{x}_{i},t_{i}\},\ i=1,2,\ldots,N_{s}$$
-这里输入向量为
-$$\bm{x}_{i}=[x_{i1},x_{i2},\ldots,x_{in}]\in \mathcal{R}^{N_{I}}$$
-输出向量为
-$$\bm{t}_{i}=[t_{i1},t_{i2},\ldots,t_{in}]\in \mathcal{R}^{N_{O}}$$
-则神经网络的数学模型输出为
+下面首先阐述神经网络的基本数学模型。对于一个具有$N_{i}$个输入神经元、$N_{o}$个输出神经元以及$N_{h}$个隐含层神经元的单隐层前馈神经网络，如果其激活函数为$g(\cdot)$，并存在$N_{s}$个输入输出样本对
+$$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$$
+这里，输入向量为
+$$\bm{x}_{j}=[x_{j,1},x_{j,2},\ldots,x_{j,N_{i}}]^{T}\in \mathcal{R}^{N_{i}}$$
+期望输出向量为
+$$\bm{t}_{j}=[t_{j,1},t_{j,2},\ldots,t_{j,N_{o}}]^{T}\in \mathcal{R}^{N_{o}}$$
+则对于任意输入向量$\bm{x}_{j}$，神经网络的实际输出为
 \begin{equation}%
 \label{eq:4.slfn}
 \begin{split}%
-o_{j}&=\sum_{i=1}^{N_{H}}\beta_{i}g(w_{i},b_{i},\bm{x}_{i})
-&=\sum_{i=1}^{N_{H}}\beta_{i}h_{i}(\bm{x}_{i})
-&=h(\bm{x}_{i})\beta
+o_{j,l}&=\sum_{i=1}^{N_{H}} \beta_{i}\cdot g(\bm{w}_{i},\bm{b},\bm{x}_{j})\\
+&=\sum_{i=1}^{N_{H}} \beta_{i}\cdot h(\bm{x}_{i})\\
+&=\bm{h}(\bm{x}_{j})^{T}\cdot\beta
 \end{split}
 \end{equation}
+其中，$l=1,2,\dots,N_{o}$。这里$\bm{h}(\bm{x}_{j})$为隐含层输出向量，$\bm{w}_{i}$和\bm{b}分别是连接输入层与隐含层的权重和偏置。
+
+激活函数为$g(\cdot)$可以是加性的（addictive），则
+\begin{equation}%
+g(\bm{w},\bm{b},\bm{x}_{j})=w_{i}\cdot\bm{x}_{j}+\bm{b}
+\end{equation}
+
 
 人工智能的发展一直推动着神经网络的研究，特别是2012年之后，深度学习（Deep Learning, DL）在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分的深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
 

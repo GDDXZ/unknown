@@ -14,11 +14,11 @@
 
 第一步的具体操作是在某个确定时刻，得到一组输入输出数据，可以确定两个线性约束不等式，将这个两个约束先后加入到之前时刻的顶点集合中，得到这一时刻的顶点集合，也就确定了当前时刻的参数集合。从理论上说，第一步得到的参数集合中的每一个值都可以作为这个时刻的估计值，但是控制律等后续计算往往需要一个具体的值，所以需要按照一定的法则从集合中确定一个最优值，一般选择多边形的中心作为这个时刻的估计值。上面的两步中，第一步信息浓缩是难点。因此，本章的重点在于第一步的算法设计。一个时刻的信息浓缩过程包含两组约束关系的先后加入，也就是两次$G$变换。这两次的变换过程一样，只是每次的数据不一样，故这里只需要考虑一次变换。另外，为了叙述方便，本章关于时刻$k$的下标省略。
 
-$d_{1}=2$时，用$\beta$和$\beta'$分别表示两个不同的多边形，其顶点集合表示（按顺时针排列，下同）为
+$d_{1}=2$时，用$\Gamma$和$\Gamma'$分别表示两个不同的多边形，其顶点集合表示（按顺时针排列，下同）为
 \begin{equation*}%
 \begin{split}%
-\beta&=\{P_{1},P_{2},\ldots,P_{N}\}\\
-\beta'&=\{P_{1}',P_{2}',\ldots,P_{N'}'\}
+\Gamma&=\{P_{1},P_{2},\ldots,P_{N}\}\\
+\Gamma'&=\{P_{1}',P_{2}',\ldots,P_{N'}'\}
 \end{split}
 \end{equation*}
 
@@ -28,9 +28,9 @@ $d_{1}=2$时，关于未知参数$\bm{\theta}$的约束不等式为
 \end{equation}
 这里$\bm{\phi}$和$\bm{\theta}$都是二维向量，$\bm{\phi}$和$e$都可以由输入输出组合得到，$\bm{\theta}$是这个不等式的未知变量。
 
-因此，变换$G(\beta,\bm{\phi},e)$可以记为映射
+因此，变换$G(\Gamma,\bm{\phi},e)$可以记为映射
 \begin{equation}%
-\mathbf{AddLinear2D}\colon \beta\rightarrow\beta'
+\mathbf{AddLinear2D}\colon \Gamma\rightarrow\Gamma'
 \end{equation}
 这就是二维参数的信息浓缩估计算法需要解决的核心部分。
 
@@ -56,11 +56,11 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \phi_{1}X_{P_{n}}+\phi_{2}Y_{P_{n}}\leq e
 \end{equation}
 
-如果不等式\eqref{eq.3.L.P}成立，则顶点$P_{n}$满足约束关系\eqref{eq.3.neq}，即在半平面$L_{c}$内；否则，顶点$P_{n}$不在半平面$L_{c}$内。根据不等式\eqref{eq.3.L.P}可以确定多边形$\beta$的所有顶点和直线$L$的位置关系，从而判断出这个多边形和直线的位置关系。
+如果不等式\eqref{eq.3.L.P}成立，则顶点$P_{n}$满足约束关系\eqref{eq.3.neq}，即在半平面$L_{c}$内；否则，顶点$P_{n}$不在半平面$L_{c}$内。根据不等式\eqref{eq.3.L.P}可以确定多边形$\Gamma$的所有顶点和直线$L$的位置关系，从而判断出这个多边形和直线的位置关系。
 
 经过分析，根据各个顶点和直线的分布情况，可以将多边形和直线的位置关系分为三类。
 \begin{enumerate}
-\item 多边形顶点在直线的同一侧，则多边形和直线没有交点，如图\ref{fig.3.beta.l.1}所示又可具体分为两种情况。第一种情况\ref{fig.poly.1.1}，多边形不变，即$\beta'=\beta$；第二种情况\ref{fig.poly.1.2}，一般是在数据出错的情况下才会发生（在定理\eqref{thm:ic1}已经指出），此时$\beta'=\varnothing$，算法停止。
+\item 多边形顶点在直线的同一侧，则多边形和直线没有交点，如图\ref{fig.3.beta.l.1}所示又可具体分为两种情况。第一种情况\ref{fig.poly.1.1}，多边形不变，即$\Gamma'=\Gamma$；第二种情况\ref{fig.poly.1.2}，一般是在数据出错的情况下才会发生（在定理\eqref{thm:ic1}已经指出），此时$\Gamma'=\varnothing$，算法停止。
 \begin{figure}[htp]
 	\centering
 	\subfigure[情形1.1]{	 % Caption of subfigure in []
@@ -124,26 +124,26 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \caption{$\mathbf{AddLinear2D}$}
 \label{alg.ic.2d}
 \begin{algorithmic}
-\REQUIRE $\beta=\{P_{1},P_{2},\ldots,P_{N}\}$\\
-\ENSURE $\beta'=\{P_{1}',P_{2}',\ldots,P_{N'}'\}$\\
-\STATE Denote the number of vertices in $\beta$ by $N$
+\REQUIRE $\Gamma=\{P_{1},P_{2},\ldots,P_{N}\}$\\
+\ENSURE $\Gamma'=\{P_{1}',P_{2}',\ldots,P_{N'}'\}$\\
+\STATE Denote the number of vertices in $\Gamma$ by $N$
 \FOR{$j=1$ to $N$}
 	\STATE Denote the $jth$ vertex by $P_{j}$
 	\STATE Let $F_{j}=\mathbf{sgn}(c-\phi^{T}P_{j})$
 \ENDFOR
 \IF{$F_{j}\geq0\ \forall 1\leq j\leq n$}
-	\STATE $\beta'\leftarrow\beta$ and return
+	\STATE $\Gamma'\leftarrow\Gamma$ and return
 \ELSIF{$F_{j}<0\ \forall 1\leq j\leq n$}
-	\STATE $\beta\leftarrow\emptyset$ and return
+	\STATE $\Gamma\leftarrow\emptyset$ and return
 \ENDIF
 \FOR{$j=2$ to $N-1$}
     \IF{($P_{j}$ and $P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j}$ and $P_{j+1}$ are in different sides)}
 		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
 		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
 		\IF {($F_{j}>0$)}
-			\STATE$\beta'=\{P_{1}^{i},P_{j},P_{2}^{i}\}$
+			\STATE$\Gamma'=\{P_{1}^{i},P_{j},P_{2}^{i}\}$
 		\ELSE
-			\STATE$\beta'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
+			\STATE$\Gamma'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
 		\ENDIF
         \STATE break
     \ELSIF{($P_{j},P_{j-1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j+1},\ldots,P_{j+a-1}$ are on the same side) $\bigwedge$ 
@@ -151,9 +151,9 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-1}P_{j}}$
 		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+a-1}P_{j+a}}$.
 		\IF {($F_{j}>0$)}
-			\STATE$\beta'=\{P_{1}^{i},P_{j},\ldots,P_{j+a-1},P_{2}^{i}\}$
+			\STATE$\Gamma'=\{P_{1}^{i},P_{j},\ldots,P_{j+a-1},P_{2}^{i}\}$
 		\ELSE
-			\STATE$\beta'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+a},\ldots,P_{n}\}$
+			\STATE$\Gamma'=\{P_{1},\ldots,P_{j-1},P_{1}^{i},P_{2}^{i},P_{j+a},\ldots,P_{n}\}$
 		\ENDIF
         \STATE break
 	\ELSIF{($P_{j},P_{j+1}$ are in different sides) $\bigwedge$ ($P_{j},P_{j-1},\ldots,P_{j-b+1}$ are on the same side) $\bigwedge$ 
@@ -161,19 +161,19 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 		\STATE $P_{1}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j-b+1}P_{j-b}}$
 		\STATE $P_{2}^{i}\leftarrow$ the intersection of $l_{i}$ and $\overline{P_{j+1}P_{j}}$.
 		\IF {($F_{j}>0$)}
-			\STATE$\beta'=\{P_{1}^{i},P_{j-b+1},\ldots,P_{j},P_{2}^{i}\}$
+			\STATE$\Gamma'=\{P_{1}^{i},P_{j-b+1},\ldots,P_{j},P_{2}^{i}\}$
 		\ELSE
-			\STATE$\beta'=\{P_{1},\ldots,P_{j-b},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
+			\STATE$\Gamma'=\{P_{1},\ldots,P_{j-b},P_{1}^{i},P_{2}^{i},P_{j+1},\ldots,P_{n}\}$
 		\ENDIF
         \STATE break
     \ENDIF
 	\STATE $j\leftarrow j+1$
 \ENDFOR
-\STATE return $\beta'$
+\STATE return $\Gamma'$
 \end{algorithmic}
 \end{algo}
 
-算法\ref{alg.ic.2d}实现了第\ref{sect:3.1}中提到的信息浓缩估计的第一步。对于第二步，一般选择多边形$\beta'$的中心作为参数估计值$\hat{\bm{\theta}}$，即
+算法\ref{alg.ic.2d}实现了第\ref{sect:3.1}中提到的信息浓缩估计的第一步。对于第二步，一般选择多边形$\Gamma'$的中心作为参数估计值$\hat{\bm{\theta}}$，即
 \begin{equation}\label{eq.3.theta}
 \begin{split}%
 &\hat{\theta}_{1}=\frac1N\sum_{n=1}^{N}X_{P'_{n}}\\
