@@ -89,7 +89,7 @@ u_{t}=\left\{
 \item 没有充分利用历史数据和关联先验信息，只是利用最近邻时刻的数据，计算结果不一定是最优的。
 \end{enumerate}
 
-以上的缺点存在，导致现有的半参数自适应控制存在很大的局限性。本章借助于其他的非线性辨识算法去设计新的非参数部分估计算法。
+以上的缺点存在，导致现有的半参数自适应控制存在很大的局限性。本章借助于其他的非线性辨识算法去设计新的非参数部分的估计算法。
 
 \subsection{神经网络}
 机器学习解决的问题从数学上主要分为分类和回归。其中分类处理的数据主要是离散型数据，回归解决的对象和思路跟控制中的估计、预测十分类似。而神经网络作为一种十分有效的回归与预测算法，在非线性辨识中应用十分广泛。神经网络主要由输入层、隐含层和输出层组成（最简单的神经网络可能没有隐含层），依据不同的激活函数或者不同的学习算法，种类十分丰富。
@@ -102,25 +102,80 @@ $$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$$
 $$\bm{x}_{j}=[x_{j,1},x_{j,2},\ldots,x_{j,N_{i}}]^{T}\in \mathcal{R}^{N_{i}}$$
 期望的输出向量为
 $$\bm{t}_{j}=[t_{j,1},t_{j,2},\ldots,t_{j,N_{o}}]^{T}\in \mathcal{R}^{N_{o}}$$
-则对于任意输入向量$\bm{x}_{j}$，第$l$个输出层神经元的输出为
+则对于任意输入向量$\bm{x}_{j}$，第$l，l=1,2,\dots,N_{o}$个输出层神经元的输出为
 \begin{equation}%
 \label{eq:4.slfn}
 \begin{split}%
-o_{j,l}&=\sum_{i=1}^{N_{h}} \beta_{i} g(\bm{w}_{i},b_{i},\bm{x}_{j})\\
-&=\sum_{i=1}^{N_{h}} \beta_{i} h(\bm{x}_{i})\\
-&=\bm{h}(\bm{x}_{j})^{T}\cdot\bm{\beta}
+o_{j,l}&=\sum_{i=1}^{N_{h}} \beta_{i,l} g(\bm{w}_{i},b_{i},\bm{x}_{j})\\
+&=\sum_{i=1}^{N_{h}} \beta_{i,l} h(\bm{x}_{i})\\
+&=\bm{h}(\bm{x}_{j})^{T}\cdot\bm{\beta}_{l}
 \end{split}
 \end{equation}
-其中，$l=1,2,\dots,N_{o}$。这里$\bm{h}(\bm{x}_{j})$为隐含层的输出向量，$\bm{w}_{i}$和$b_{i}$分别是连接第$i$个隐层神经元与输入层的权重向量和偏置。
+其中，$\bm{w}_{i}$和$b_{i}$分别是连接第$i$个隐层神经元与输入层的权重向量和偏置，$\bm{\beta}_{l}$是连接$l$个输出层神经元和隐含层的权重，$\bm{h}(\bm{x}_{j})$为隐含层的输出向量。
 
 一般来说，同一层的激活函数是一致的。如果第$i$个隐含神经元的激活函数$g(\cdot)$是加性的（addictive），比如Sigmoid型或者正弦型，则其输出为
 \begin{equation}%
 g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(\bm{w}_{i}^{T}\cdot\bm{x}_{j}+b_{i})
 \end{equation}
-如果是RBF网络，则
+如果是径向基（Radias base function, RBF）网络，则
 \begin{equation}%
 g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{equation}
+此时，$g$是某种径向对称的标量函数，通常定义为关于样本到数据中心$\bm{w}_{i}$之间的欧氏距离的单调函数，比如高斯径向基函数等。这样，在命名上，$\bm{w}_{i}$和$b_{i}$一般不称为隐层的权重和偏置，而是激活函数的中心（center）和影响因子（impact factor）。
+
+理论上，对于给定的样本数据集，上述定义的具有$N_{h}$个隐含层神经元和激活函数为$g(\cdot)$的SLFN，具有零误差逼近$N_{s}$个样本的性质，即
+\begin{equation}
+\sum_{j=1}^{N_{h}}\|o_{j}-t_{j}\|=0,\ j=1,2,\dots,N_{s}
+\end{equation}
+这意味着，存在一组$\bm{w}_{i}$、$b_{i}$和$\bm{\beta}$，使得
+\begin{equation}
+\bm{h}(\bm{x}_{j})\bm{\beta}=t_{j},\ j=1,2,\dots,N_{s}
+\end{equation}
+将上面$N_{s}$个方程堆积起来，写成紧凑的矩阵形式就是
+\begin{equation}\label{eq:4.ht}
+\bm{H}\bm{\beta}=\bm{T} 
+\end{equation}
+其中，$\bm{H}$是隐含层的输出矩阵，具体为
+\begin{equation}\label{eq.4.HT}
+\begin{split}
+&\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}};\bm{x}_{1},\dots,\bm{x}_{N_{s}})=\\
+&\begin{bmatrix}
+&h(\bm{w}_{1},b_{1},\bm{x}_{1}) &\cdots &h(\bm{w}_{N_{s}},b_{N_{s}},\bm{x}_{N_{s}})\\
+&\vdots &\cdots & \vdots\\
+&h(\bm{w}_{1},b_{1},\bm{x}_{N_{s}}) &\cdots &h(\bm{w}_{N_{s}},b_{N_{s}},\bm{x}_{N_{s}})
+\end{bmatrix}_{N_{s}\times N_{h}}
+\end{split}
+\end{equation}
+\begin{equation}\label{eq:4.beta}
+\bm{\beta} = \begin{bmatrix}%
+&\bm{\beta}_{1}^{T}\\
+&\vdots\\
+&\bm{\beta}_{N_{h}}^{T}
+\end{bmatrix}_{N_{h}\times N_{o}}
+\end{equation}
+且
+\begin{equation}\label{eq:4.beta}
+\bm{T} = \begin{bmatrix}%
+&\bm{t}_{1}^{T}\\
+&\vdots\\
+&\bm{t}_{N_{h}}^{T}
+\end{bmatrix}_{N_{s}\times N_{o}}
+\end{equation}
+
+如果隐含层神经元个数等于样本的个数，即$N_{s}=N_{h}$，那么矩阵$\bm{H}$是方阵且可逆的，则SLFN可以实现零误差逼近的结果。然而，在实际的大多数情况下，隐含层神经元个数远小于样本个数，即$N_{s}\ll N_{h}$。这样，$H$不是一个方阵，就不存在准确的一组$\bm{w}_{i}$、$b_{i}$和$\bm{\beta}$，使得$\bm{H}\bm{\beta}=\bm{T}$精确成立，而是寻找合适的一组$\hat{\bm{w}}_{i}$、$\hat{b}_{i}$和$\hat{\beta}$使得
+\begin{equation}%
+\begin{split}%
+&\|\bm{H}(\hat{\bm{w}}_{1},\dots,\hat{\bm{w}}_{N_{h}};\hat{b}_{1},\dots,\hat{b}_{N_{h}})\hat{\bm{\beta}}-\bm{T}\|=\\
+&\min_{\hat{\bm{w}}_{i},\hat{b}_{i},\hat{\bm{\beta}}}\|H(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}})-\bm{T}\|
+\end{split}
+\end{equation}
+这等价于最小化损失函数
+\begin{equation}\label{eq:4.cost}
+E = \sum{j=1}^{N_{s}}\(\bm{h}(x_{j})\bm{\beta}-t_{j}\)^{2}
+\end{equation}
+
+多层网络的学习能力依赖于强大的学习算法，误差反向传播（error BackPropagation, BP）是一种十分经典的代表。迄今为止，现实中的神经网络都是使用BP算法进行训练，不仅仅局限于多层前馈神经网络，还适用于递归神经网络等其它类型。
+
 
 人工智能的发展一直推动着神经网络的研究，特别是2012年之后，深度学习（Deep Learning, DL）在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分的深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
 
