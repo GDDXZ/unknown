@@ -102,16 +102,16 @@ $$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$$
 $$\bm{x}_{j}=[x_{j,1},x_{j,2},\ldots,x_{j,N_{i}}]^{T}\in \mathcal{R}^{N_{i}}$$
 期望的输出向量为
 $$\bm{t}_{j}=[t_{j,1},t_{j,2},\ldots,t_{j,N_{o}}]^{T}\in \mathcal{R}^{N_{o}}$$
-则对于任意输入向量$\bm{x}_{j}$，第$l，l=1,2,\dots,N_{o}$个输出层神经元的输出为
+则对于任意输入向量$\bm{x}_{j}$，第$l$个（$l=1,2,\dots,N_{o}$）输出层神经元的输出为
 \begin{equation}%
-\label{eq:4.slfn}
+\label{eq:4.slfn.o}
 \begin{split}%
 o_{j,l}&=\sum_{i=1}^{N_{h}} \beta_{i,l} g(\bm{w}_{i},b_{i},\bm{x}_{j})\\
 &=\sum_{i=1}^{N_{h}} \beta_{i,l} h(\bm{x}_{i})\\
 &=\bm{h}(\bm{x}_{j})^{T}\cdot\bm{\beta}_{l}
 \end{split}
 \end{equation}
-其中，$\bm{w}_{i}$和$b_{i}$分别是连接第$i$个隐层神经元与输入层的权重向量和偏置，$\bm{\beta}_{l}$是连接$l$个输出层神经元和隐含层的权重，$\bm{h}(\bm{x}_{j})$为隐含层的输出向量。
+其中，$\bm{w}_{i}$和$b_{i}$分别是连接第$i$个隐层神经元与输入层的权重向量和阈值，$\bm{\beta}_{l}$是连接$l$个输出层神经元和隐含层的权重，$\bm{h}(\bm{x}_{j})$为隐含层的输出向量。
 
 一般来说，同一层的激活函数是一致的。如果第$i$个隐含神经元的激活函数$g(\cdot)$是加性的（addictive），比如Sigmoid型或者正弦型，则其输出为
 \begin{equation}%
@@ -121,22 +121,22 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(\bm{w}_{i}^{T}\cdot\bm{x}_{j}+b_{i})
 \begin{equation}%
 g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{equation}
-此时，$g$是某种径向对称的标量函数，通常定义为关于样本到数据中心$\bm{w}_{i}$之间的欧氏距离的单调函数，比如高斯径向基函数等。这样，在命名上，$\bm{w}_{i}$和$b_{i}$一般不称为隐层的权重和偏置，而是激活函数的中心（center）和影响因子（impact factor）。
+此时，$g$是某种径向对称的标量函数，通常定义为关于样本到数据中心$\bm{w}_{i}$之间的欧氏距离的单调函数，比如高斯径向基函数等。这样，在命名上，$\bm{w}_{i}$和$b_{i}$一般不称为隐层的权重和阈值，而是激活函数的中心（center）和影响因子（impact factor）。
 
 理论上，对于给定的样本数据集，上述定义的具有$N_{h}$个隐含层神经元和激活函数为$g(\cdot)$的SLFN，具有零误差逼近$N_{s}$个样本的性质，即
-\begin{equation}
+\begin{equation*}
 \sum_{j=1}^{N_{h}}\|o_{j}-t_{j}\|=0,\ j=1,2,\dots,N_{s}
-\end{equation}
+\end{equation*}
 这意味着，存在一组$\bm{w}_{i}$、$b_{i}$和$\bm{\beta}$，使得
 \begin{equation}
 \bm{h}(\bm{x}_{j})\bm{\beta}=t_{j},\ j=1,2,\dots,N_{s}
 \end{equation}
 将上面$N_{s}$个方程堆积起来，写成紧凑的矩阵形式就是
-\begin{equation}\label{eq:4.ht}
-\bm{H}\bm{\beta}=\bm{T} 
+\begin{equation}\label{eq:4.nn.HT}
+\bm{H}\bm{\beta}=\bm{T}
 \end{equation}
 其中，$\bm{H}$是隐含层的输出矩阵，具体为
-\begin{equation}\label{eq.4.HT}
+\begin{equation}\label{eq:4.nn.H}
 \begin{split}
 &\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}};\bm{x}_{1},\dots,\bm{x}_{N_{s}})=\\
 &\begin{bmatrix}
@@ -146,7 +146,7 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{bmatrix}_{N_{s}\times N_{h}}
 \end{split}
 \end{equation}
-\begin{equation}\label{eq:4.beta}
+\begin{equation}\label{eq:4.nn.beta}
 \bm{\beta} = \begin{bmatrix}%
 &\bm{\beta}_{1}^{T}\\
 &\vdots\\
@@ -154,7 +154,7 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{bmatrix}_{N_{h}\times N_{o}}
 \end{equation}
 且
-\begin{equation}\label{eq:4.beta}
+\begin{equation}\label{eq:4.nn.T}
 \bm{T} = \begin{bmatrix}%
 &\bm{t}_{1}^{T}\\
 &\vdots\\
@@ -162,24 +162,90 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{bmatrix}_{N_{s}\times N_{o}}
 \end{equation}
 
-如果隐含层神经元个数等于样本的个数，即$N_{s}=N_{h}$，那么矩阵$\bm{H}$是方阵且可逆的，则SLFN可以实现零误差逼近的结果。然而，在实际的大多数情况下，隐含层神经元个数远小于样本个数，即$N_{s}\ll N_{h}$。这样，$H$不是一个方阵，就不存在准确的一组$\bm{w}_{i}$、$b_{i}$和$\bm{\beta}$，使得$\bm{H}\bm{\beta}=\bm{T}$精确成立，而是寻找合适的一组$\hat{\bm{w}}_{i}$、$\hat{b}_{i}$和$\hat{\beta}$使得
+如果隐含层神经元个数等于样本的个数，即$N_{s}=N_{h}$，那么矩阵$\bm{H}$是方阵且可逆的，则SLFN可以实现零误差逼近的结果。然而，在实际的大多数情况下，隐含层神经元个数远小于样本个数，即$N_{h}\ll N_{s}$。这样，$\bm{H}$不是一个方阵，就不存在准确的一组$\bm{w}_{i}$、$b_{i}$和$\bm{\beta}$，使得$\bm{H}\bm{\beta}=\bm{T}$精确成立。这种情况下，神经网络学习的目标就是寻找合适的一组$\hat{\bm{w}}_{i}$、$\hat{b}_{i}$和$\hat{\beta}$，使得
 \begin{equation}%
 \begin{split}%
 &\|\bm{H}(\hat{\bm{w}}_{1},\dots,\hat{\bm{w}}_{N_{h}};\hat{b}_{1},\dots,\hat{b}_{N_{h}})\hat{\bm{\beta}}-\bm{T}\|=\\
-&\min_{\hat{\bm{w}}_{i},\hat{b}_{i},\hat{\bm{\beta}}}\|H(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}})-\bm{T}\|
+&\min_{\hat{\bm{w}}_{i},\hat{b}_{i},\hat{\bm{\beta}}}\|\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}})-\bm{T}\|
 \end{split}
 \end{equation}
-这等价于最小化损失函数
-\begin{equation}\label{eq:4.cost}
-E = \sum{j=1}^{N_{s}}\(\bm{h}(x_{j})\bm{\beta}-t_{j}\)^{2}
+成立，等价于最小化基于累计误差的损失函数
+\begin{equation}\label{eq:4.nn.cost}
+E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 \end{equation}
 
-多层网络的学习能力依赖于强大的学习算法，误差反向传播（error BackPropagation, BP）是一种十分经典的代表。迄今为止，现实中的神经网络都是使用BP算法进行训练，不仅仅局限于多层前馈神经网络，还适用于递归神经网络等其它类型。
+多层网络的学习能力依赖于强大的学习算法，误差反向传播（error BackPropagation, BP）是一种十分经典的代表。迄今为止，现实中的神经网络都是使用BP算法进行训练，不仅仅局限于多层前馈神经网络，还适用于递归神经网络等其它类型。BP算法是一种基于梯度下降（gradient-descent-based）的学习算法。将需要调整的权重$\bm{w}_{j}$和$\bm{\beta}$以及阈值$b_{j}$等网络参数，整体记作向量$\bm{W}$，则BP算法按照下面的式子调整$\bm{W}$:
+\begin{equation}\label{eq:4.bp.W}
+\bm{W}_{k} = \bm{W}_{k-1}-\eta\frac{\partial E(\bm{W})}{\bm{W}},
+\end{equation}
+其中，$\eta$是学习速率。
 
+\begin{algo}[htp]
+\caption{$\mathbf{BP}$学习算法的主要流程}
+\label{alg.bp}
+\begin{algorithmic}%
+\REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$；\\
+学习速率$\eta$；\\
+迭代次数上限$N_{max}$\\
+\STATE 初始化所有网络参数（随机选择，或者根据经验指定）
+\FOR{$m=1$ to $N_{max}$}
+  \STATE 根据输入样本和当前参数计算所有样本的输出结果；
+  \STATE 计算输出层的累计误差；
+  \STATE 将误差逆向传递至隐层神经元，根据隐层神经元的误差来对连接权重和阈值进行调整；
+  \STATE 根据\eqref{eq:4.bp.W}更新$\bm{W}$；
+  \STATE 判断累积误差是否达到停止条件，如果达到，则退出当前循环；否则，继续当前迭代过程；
+\ENDFOR
+\ENSURE 网络参数向量$\bm{W}$确定的前馈型神经网络\\
+\end{algorithmic}
+\end{algo}
 
-人工智能的发展一直推动着神经网络的研究，特别是2012年之后，深度学习（Deep Learning, DL）在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分的深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
+在前馈型神经网络中，BP算法的主要工作流程见算法\eqref{alg.bp}。从学习过程可以看出，BP算法存在如下问题：
+\begin{enumerate}
+\item 学习速率$\eta$的大小会影响算法的迭代过程，主要表现在，如果$\eta$太大，则算法会变得不稳定且可能会发散；如果$\eta$太小，则收敛速度非常慢。
+\item 本质上是基于梯度的搜索寻优方法，会陷入局部最优的困境，即网络参数的更新会收敛到某个误差局部最小的情况，这是梯度下降所导致的。
+\item 神经网络可能存在过度训练、过度拟合的情形，以致于网络的泛化能力很差。
+\item 从初始解出发，迭代寻找最优参数值，其过程通常非常耗时，难以做到实时在线计算。
+\end{enumerate}
+
+以上这些因素对于神经网络在控制系统中的应用带来了很多问题，前面三条包括学习速率、局部最优、过度训练的问题有一些方法去改进，但是第四条迭代过程耗时这个问题是由梯度算法本身的特性所决定，难以从根本上解决。这就导致了超限学习机的提出。
 
 \subsection{ELM及其变体}
+传统上对于神经网络的理解，都认为需要网络的学习过程需要调整所有的参数。但实际上，如果输入层到隐含层的权重和阈值不变，那么隐含层的输出矩阵$\bm{H}$就保持不变，仅调整隐含层到输出层的权值就可以改变整个网络的最终输出。超限学习机就是利用这个思路建立起来的，用来解决传统基于梯度学习算法的耗时训练的缺点。
+
+超限学习机的基本算法主要包括三个步骤，针对单隐层前馈神经网络的学习过程见算法\ref{alg.elm}。
+\begin{algo}[htp]
+\caption{$\mathbf{ELM}$算法}
+\label{alg.elm}
+\begin{algorithmic}%
+\REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$\\
+\STATE Step1: 随机初始化输入权重$\bm{w}_{i}$和阈值$b_{i}$参数
+\STATE Step2: 计算隐含层输出矩阵$\bm{H}$，见表达式\eqref{eq.4.nn.H}
+\STATE Step3: 计算输出层权重向量$\bm{\beta}$，根据如下表达式
+\begin{equation}\label{eq:4.elm.beta}
+\bm{\beta}=\bm{H}^{\dag}\bm{T}
+\end{equation}
+其中$\bm{H}$、$\bm{T}$和$\bm{\beta}$的定义分别见方程\eqref{eq:4.nn.H}、\eqref{eq:4.nn.T}和\eqref{eq:4.nn.beta}，而$\bm{H}^{\dag}$代表了矩阵$\bm{H}$的Moore-Penrose广义逆。
+\ENSURE 网络参数向量$\bm{W}$确定的前馈型神经网络\\
+\end{algorithmic}
+\end{algo}
+
+图\eqref{fig:elm}表示的是ELM在单隐层神经网络学习过程中的主要计算步骤。实际上，\eqref{eq:4.elm.beta}计算的是方程\eqref{eq:4.nn.HT}的最小二乘解，即
+\begin{equation}\label{}
+\bm{\beta}=(\bm{H}^{T}\bm{H})^{-1}\bm{H}^{T}\bm{T} 
+\end{equation}
+
+\begin{figure}
+ \centering
+ \includegraphics[width=0.75\textwidth]{ch1-ELM.png}
+ \caption{超限学习机的网络结构（单隐层）和算法流程}\label{fig:elm}
+\end{figure}
+
+由于没有迭代过程，因此ELM在解决分类或者回归等问题时学习时间很短，主要耗时在矩阵的加减乘除和求逆运算的时间。从学习过程可以看出，ELM的求解思路和最优化方法以及最小二乘辨识算法有些相似，因此基本算法存在的问题和改进思路也类似。上述算法\ref{alg.elm}介绍的是原始ELM的批处理形式，由于实际中样本可能不是一次性获得的，因此和最小二乘算法一样，得到ELM的递推形式，即在线序列ELM算法（OS-ELM）\upcite{LiangHuang2006}。
+
+OS-ELM的推导过程不再详细介绍，和RLS类似。OS-ELM对于控制系统的辨识十分有用，因为控制系统的数据大多是实时产生的，需要在线辨识。然而OS-ELM和批处理形式最后的效果是一致的，只是中间过程不一样，并没有对网络结构和目标函数进行优化。基本ELM优化的仅仅是经验损失风险，目标函数见\eqref{eq:4.nn.cost}，因此ELM和OS-ELM都可能存在泛化能力不足和过拟合的现象。为了解决这个问题，相关学者\upcite{Escandell2011,HuynhWon2011}提出了正则化ELM（简称Re-ELM）和正则化OS-ELM（简称ReOS-ELM）。
+
+人工智能的发展一直推动着神经网络的研究，特别是2012年之后，深度学习（Deep Learning, DL）在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分的深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。针对大数据的应用，超限学习机也有相关变体，如H-ELM（
+High-Performance Extreme Learning Machines）\upcite{AkusokBjork2015}与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
 \begin{table}
 \centering
 \caption{超限学习机与常见深度学习算法的性能比较}\label{tab:elm-dl}
@@ -196,6 +262,29 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
 \bottomrule
 \end{tabular*}
 \end{table}
+
+\subsection{ELM估计}
+快速、高精度的特点使得ELM迅速称为系统与控制领域很好的建模、估计与预测算法。特别是经过优化，提高泛化等方面的性能的ELM变体算法，如Re-OSELM，用来建立非线性模型的思路如图\eqref{fig.reoselm}所示。
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.7\textwidth ]{ch4-re-elm-c.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+  \caption{Re-OSELM算法的建模框图}
+  \label{fig.reoselm}
+\end{figure}
+
+下面的单输入单输出离散时间非线性系统
+\begin{equation}\label{eq:4.siso}
+y_{k+1} = g(\bm{x}_{k})+\phi(\bm{x}_{k})u_{k}
+\end{equation}
+
+ITF-OELM控制框图如图\ref{fig.itf-oelm}。
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.7\textwidth ]{ch4-itf.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+  \caption{基于ITF-OELM的自适应控制框图}
+  \label{fig.itf-oelm}
+\end{figure}
 
 \section{自适应控制器设计}
 半参数自适应控制
