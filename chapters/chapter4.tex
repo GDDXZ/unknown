@@ -163,7 +163,7 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{equation}
 
 如果隐含层神经元个数等于样本的个数，即$N_{s}=N_{h}$，那么矩阵$\bm{H}$是方阵且可逆的，则SLFN可以实现零误差逼近的结果。然而，在实际的大多数情况下，隐含层神经元个数远小于样本个数，即$N_{h}\ll N_{s}$。这样，$\bm{H}$不是一个方阵，就不存在准确的一组$\bm{w}_{i}$、$b_{i}$和$\bm{\beta}$，使得$\bm{H}\bm{\beta}=\bm{T}$精确成立。这种情况下，神经网络学习的目标就是寻找合适的一组$\hat{\bm{w}}_{i}$、$\hat{b}_{i}$和$\hat{\beta}$，使得
-\begin{equation}%
+\begin{equation}\label{eq:4.nn.H-T}
 \begin{split}%
 &\|\bm{H}(\hat{\bm{w}}_{1},\dots,\hat{\bm{w}}_{N_{h}};\hat{b}_{1},\dots,\hat{b}_{N_{h}})\hat{\bm{\beta}}-\bm{T}\|=\\
 &\min_{\hat{\bm{w}}_{i},\hat{b}_{i},\hat{\bm{\beta}}}\|\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}})-\bm{T}\|
@@ -213,7 +213,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 传统上对于神经网络的理解，都认为需要网络的学习过程需要调整所有的参数。但实际上，如果输入层到隐含层的权重和阈值不变，那么隐含层的输出矩阵$\bm{H}$就保持不变，仅调整隐含层到输出层的权值就可以改变整个网络的最终输出。超限学习机就是利用这个思路建立起来的，用来解决传统基于梯度学习算法的耗时训练的缺点。
 
 超限学习机的基本算法主要包括三个步骤，针对单隐层前馈神经网络的学习过程见算法\ref{alg.elm}。
-\begin{algo}[htp]
+\begin{algo}
 \caption{$\mathbf{ELM}$算法}
 \label{alg.elm}
 \begin{algorithmic}%
@@ -230,14 +230,14 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 \end{algo}
 
 图\eqref{fig:elm}表示的是ELM在单隐层神经网络学习过程中的主要计算步骤。实际上，\eqref{eq:4.elm.beta}计算的是方程\eqref{eq:4.nn.HT}的最小二乘解，即
-\begin{equation}\label{}
+\begin{equation}
 \bm{\beta}=(\bm{H}^{T}\bm{H})^{-1}\bm{H}^{T}\bm{T} 
 \end{equation}
 
 \begin{figure}
  \centering
  \includegraphics[width=0.75\textwidth]{ch1-ELM.png}
- \caption{超限学习机的网络结构（单隐层）和算法流程}\label{fig:elm}
+ \caption{超限学习机的网络结构（单隐层前馈型）和算法流程}\label{fig:elm}
 \end{figure}
 
 由于没有迭代过程，因此ELM在解决分类或者回归等问题时学习时间很短，主要耗时在矩阵的加减乘除和求逆运算的时间。从学习过程可以看出，ELM的求解思路和最优化方法以及最小二乘辨识算法有些相似，因此基本算法存在的问题和改进思路也类似。上述算法\ref{alg.elm}介绍的是原始ELM的批处理形式，由于实际中样本可能不是一次性获得的，因此和最小二乘算法一样，得到ELM的递推形式，即在线序列ELM算法（OS-ELM）\upcite{LiangHuang2006}。
@@ -245,7 +245,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 OS-ELM的推导过程不再详细介绍，和RLS类似。OS-ELM对于控制系统的辨识十分有用，因为控制系统的数据大多是实时产生的，需要在线辨识。然而OS-ELM和批处理形式最后的效果是一致的，只是中间过程不一样，并没有对网络结构和目标函数进行优化。基本ELM优化的仅仅是经验损失风险，目标函数见\eqref{eq:4.nn.cost}，因此ELM和OS-ELM都可能存在泛化能力不足和过拟合的现象。为了解决这个问题，相关学者\upcite{Escandell2011,HuynhWon2011}提出了正则化ELM（简称Re-ELM）和正则化OS-ELM（简称ReOS-ELM）。
 
 人工智能的发展一直推动着神经网络的研究，特别是2012年之后，深度学习（Deep Learning, DL）在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分的深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。针对大数据的应用，超限学习机也有相关变体，如H-ELM（
-High-Performance Extreme Learning Machines）\upcite{AkusokBjork2015}与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
+High-Performance Extreme Learning Machine）\upcite{AkusokBjork2015}与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
 \begin{table}
 \centering
 \caption{超限学习机与常见深度学习算法的性能比较}\label{tab:elm-dl}
@@ -264,7 +264,11 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
 \end{table}
 
 \subsection{ELM估计}
-快速、高精度的特点使得ELM迅速称为系统与控制领域很好的建模、估计与预测算法。特别是经过优化，提高泛化等方面的性能的ELM变体算法，如Re-OSELM，用来建立非线性模型的思路如图\eqref{fig.reoselm}所示。
+基于机器学习的辨识与建模是数据驱动的，可以适用于线性和非线性系统，主要建立系统的输入输出模型。快速、高精度的特点使得ELM迅速称为系统与控制领域很好的建模、估计与预测算法。特别是经过优化，提高泛化等方面的性能的ELM变体算法，如Re-OSELM。不同于\eqref{eq:4.nn.cost}和\eqref{eq:4.nn.H-T}，ReOS-ELM最小化目标的损失函数是
+\begin{equation}\label{eq:4.re.cost}
+\|\bm{H}\bm{\beta}-T\|^{2}+\lambda\|\bm{\beta}\|^{2}
+\end{equation}
+正则化因子$\lambda$的引入提高了网络的泛化能力。图\eqref{fig.reoselm}展示了用Re-OSELM建立非线性模型的框图。
 
 \begin{figure}[!htb]
   \centering
@@ -273,10 +277,21 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
   \label{fig.reoselm}
 \end{figure}
 
-下面的单输入单输出离散时间非线性系统
+类似于RLS，OS-ELM和Re-OSELM等算法在系统建模与估计过程一般都是分为两个阶段。第一个阶段是初始化网络参数和输出权重$\bm{\beta}$估计值。对于Re-OSELM来说，需要一部分的离线输入输出数据用来完成初始化阶段，通过网络得出$\bm{H}_{0}$和$\bm{T}_{0}$之后，需要计算
+\begin{equation}
+\begin{split}%
+\bm{P}_{0}&=(\bm{H}_{0}^{T}\bm{H}_{0}+\lambda \bm{I}_{N_{h}})^{-1}\\
+\bm{\beta}^{0}&=\bm{P}_{0}\bm{H}_{0}\bm{T}_{0}
+\end{split}
+\end{equation}
+
+在Re-OSELM算法更新权重的过称中引入恰当的或者自适应的遗忘因子$\pho$可以使得算法能够应用到时变参数系统中。由于正则化因子$\lambda$的存在，即使不需要大于隐含层个数的样本数据用来初始化$\bm{\beta}^{0}$，初始小规模的训练集也是比不可少的。然而，在控制系统中，由于输出值跟实际输入密切相关，因此一定数量的离线输入输出数据一般情况下是难以获得的，这就限制了Re-OSELM在实际控制系统中的应用。
+
+ITF-OELM算法就是用来解决缺少离线初始化数问题而提出的。ITF-OELM算法主要针对下面的单输入单输出离散时间非线性系统
 \begin{equation}\label{eq:4.siso}
 y_{k+1} = g(\bm{x}_{k})+\phi(\bm{x}_{k})u_{k}
 \end{equation}
+这里$\bm{x}_{k}$是由$\{u_{k},y_{k}\}$组成的回归向量。
 
 ITF-OELM控制框图如图\ref{fig.itf-oelm}。
 \begin{figure}[!htb]
