@@ -13,7 +13,7 @@ y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{psi}_{k}})+\omega_{k+1}
 \end{equation}
 其中，$\bm{\theta}$是未知参数向量，$f(\cdot)$是未知函数。同理，令
 \begin{equation}
-z_{k} = f(\bm{psi}_{k}) + \omega_{k+1}
+z_{k} = f(\bm{\psi}_{k}) + \omega_{k+1}
 \end{equation}
 
 针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\omega_{k+1}$的先验信息，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
@@ -282,6 +282,7 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
 \bm{\beta}^{0}&=\bm{P}_{0}\bm{H}_{0}\bm{T}_{0}
 \end{split}
 \end{equation}
+这里，$\bm{I}_{N_{h}}$是$N_{h}\times N_{h}$的单位矩阵
 
 在Re-OSELM算法更新权重的过称中引入恰当的或者自适应的遗忘因子$\pho$可以使得算法能够应用到时变参数系统中。由于正则化因子$\lambda$的存在，即使不需要大于隐含层个数的样本数据用来初始化$\bm{\beta}^{0}$，初始小规模的训练集也是比不可少的。然而，在控制系统中，由于输出值跟实际输入密切相关，因此一定数量的离线输入输出数据一般情况下是难以获得的，这就限制了Re-OSELM在实际控制系统中的应用。
 
@@ -315,12 +316,93 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \begin{equation}
 \hat{z}_{k-1}=y_{k}-\phi_{k}^{T}\hat{\theta}_{k-1}-u_{k-1}
 \end{equation}
-这个非线性估计部分是除去参数估计之后的剩余部分。和其他监督学习算法一样，网络的训练结果依赖于样本数据的准确性。$\hat{z}_{k-1}$的值依赖于参数估计值$\hat{\theta}$，因此当参数估计值趋于稳定或者参数集合收敛到一定范围之后，需要重新初始化网络参数，继续辨识。也就是说，本课题在实施ITF-OELM算法时，不直接采用原本的再学习机制，而是引入另外一种情况下的再学习机制。这样就可以做到非参数估计更加准确。
+这个非线性估计部分是除去参数估计之后的剩余部分。用单隐层网络加上ELM学习算法得到的估计值是
+\begin{equation}\label{eq:4.z.breave}
+\breve{z}_{k}=H_{k}\beta^{k}
+\end{equation}
 
-ELM算法的估计过程具体将和自适应控制器在下一节一起介绍。
+和其他监督学习算法一样，网络的训练结果依赖于样本数据的准确性。$\hat{z}_{k-1}$的值依赖于参数估计值$\hat{\theta}$，因此当参数估计值趋于稳定或者参数集合收敛到一定范围之后，需要重新初始化网络参数，继续辨识。也就是说，本课题在实施ITF-OELM算法时，不直接采用原本的再学习机制，而是引入另外一种情况下的再学习机制。这样就可以做到非参数估计更加准确。
+
+本课题基于ELM算法估计非参数部分的实施过程依赖和控制密切相关，故具体算法公式将和自适应控制器设计一起在下一节介绍。
 
 \section{自适应控制器设计}
-用信息浓缩估计参数部分，用ELM估计非参数部分，下面在前面两种算法的基础上，设计半参数自适应控制器，主要包含两个过程。
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.7\textwidth]{ch4-elm-use.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+  \caption{半参数自适应控制系统中采用的单隐层前馈网络结构}
+  \label{fig.elm.use}
+\end{figure}
+
+用信息浓缩估计参数部分，用ELM估计非参数部分，如图\ref{fig.elm.use}。在前面两种算法的基础上，可以设计出半参数自适应控制器，主要包含两个过程，即初始化阶段和自适应控制阶段。在初始化阶段，需要完成信息浓缩估计器关联先验信息设置相关参数集的任务，以及ELM学习算法的网络参数初始化任务；自适应控制阶段前半段主要是参数估计，后半段主要是神经网络的学习更新非参数部分的估计，从而产生合适的控制输入，完成轨迹跟踪任务。下面介绍具体实施流程，其中信息浓缩估计部分直接针对二维参数情形设计。
+
+\begin{enumerate}%
+%1
+\item \textbf{初始化阶段}
+\begin{enumerate}%
+%1.1
+\item 设置$k=0$，系统的初始状态为
+\begin{equation*}
+\begin{split}%
+\phi_{0}&=[y_{0},\ y_{-1}]^{T}\\
+\psi_{0}&=[y_{0},\dots,,y_{-p_{2}},u_{-1},\dots,u_{-q_{2}+1}]
+\end{split}
+\end{equation*}
+\item 根据关于$\bm{\theta}$的先验信息可以得到初始的多边形为$\Gamma_{0}$（通常是四边形），以及初始的参数估计$\hat{\bm{\theta}}_{0}$.
+\item 定义SLFN网络的隐含层神经元个数为$N_{h}$，正则化因子为$\lambda$和遗忘因子为$\rho$.
+\item 对于第$i$个隐层神经元，随机初始化网络参数$(a_{i},b_{i})$，$i=1,2,\ldots,N_{h}$.
+\item 设置$\beta^{0}$和$P_{0}$为
+\begin{equation}\label{eq.elm0}
+\begin{split}%
+& P_{0} = (\lambda \bm{I_{N_{h}}})^{-1} \\
+& \beta^{0} = \bm{0}_{N_{h}}
+\end{split}
+\end{equation}
+这里，$\bm{I_{N_{h}}}$和$\bm{0}_{N_{h}}$分别记作$N_{h}\times N_{h}$的单位矩阵和$N_{h}\times1$的零向量。
+\item 设置再学习机制参数。让$\sigma_{k}=var(C_{k})$代表在多边形区域$C_{k}$的所有顶点坐标的方差，即
+\begin{equation}
+\begin{split}%
+\sigma_{n_{k}}(1) &= var(X_{P_{1}},X_{P_{2}},\ldots,X_{P_{n_{k}}}) \\
+\sigma_{n_{k}}(2) &= var(Y_{P_{1}},Y_{P_{2}},\ldots,Y_{P_{n_{k}}})
+\end{split}
+\end{equation}
+\item 设置$Flag=0$，意味着尚未激活再学习过程，并记$\delta$为学习方差的上限。
+\item 随机产生一个有界的控制输入$u_{0}$，并发送给控制系统\eqref{eq:4.semi-u}；设置$k=1$，然后转到Step 2(a).
+\end{enumerate}
+%2
+\item \textbf{自适应控制阶段}
+\begin{enumerate}%
+%2.a
+\item 获得系统在第$k$个时刻的输出值$y_{k}$，并计算$e_{k,1}$和$e_{k,2}$.
+%2.b
+\item 用第三章的公式得到当前的多边形区域$C_{k}$，并将$C_{k}$的中心作为当前参数估计值$\hat{\bm{\theta}}_{k}$.
+%2.c
+\item 计算$\sigma_{k}$，如果$Flag=0\bigwedge\sigma_{k}(1)\leq\delta\bigwedge\sigma_{n_{k}}(2)\leq\delta$ 那么设置$\gamma=1$与$Flag=1$。
+%2.d
+\item 设置$\hat{z}_{k-1}=y_{k}-\phi_{k-1}^{T}\hat{\bm{\theta}}_{k}-u_{k-1}$.
+%2.e
+\item 如果$\gamma=1$那么执行(i); 否则，执行(ii).
+\begin{enumerate}%
+\item \emph{Updating:} 将$(\bm{\psi}_{k-1},\hat{z}_{k-1})$作为SLFN的输入输出样本数据，计算网络的隐含层输出$H_{k-1}$，并使用下面的等式计算隐含层到输出层的权重
+\begin{equation}\label{eq.elmk}
+\begin{split}%
+P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{T}(\rho\\
+&+H_{k-1}P_{k-1}H_{k-1}^{T})^{-1}H_{k-1}P_{k-1}) \\
+\beta^{k}=&\beta^{k-1} + P_{k-1}H_{k-1}^{T}(\hat{z}_{k-1}-H_{k-1}\beta^{k-1})
+\end{split}
+\end{equation}
+\item \emph{Relearning:}执行在初始化阶段的步骤1-(c),1-(d),1-(e).
+\end{enumerate}
+\item 将$\bm{\psi}_{k}$作为SLFN的输入向量，并计算隐含层的输出矩阵$H_{k}$，从而得到非参数的估计
+\begin{equation}\label{eq.hat.z.k}
+\breve{z}_{k}=H_{k}\beta^{k}
+\end{equation}
+\item 结合参数和非参数两部分的估计，根据必然等价原理设计控制输入为
+\begin{equation}\label{eq.4:u}
+u_{k}=y^{*}_{k+1}-\phi_{k}^{T}\hat{\bm{\theta}}_{k}-\breve{z}_{k}
+\end{equation}
+\item 设置$k=k+1$，然后转到Step 2(a).
+\end{enumerate}
+\end{enumerate}
 
 \section{仿真实例}
 
