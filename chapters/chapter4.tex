@@ -313,7 +313,7 @@ $$\bm{\psi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{2}},u_{k-1},\dots,u_{k-q_{2}+1}]^{
 $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因此网络的输出层只有一个神经元，输入层含$d_{2}$个神经元。
 
 本课题针对半参数系统在原始的ITF-OELM算法基础上做了几点变化。首先是估计的非线性函数只有一个，其次是在学习机制的不同。训练网络采用的输入数据$\bm{\psi}_{k}$直接来源于输入和观测到的历史输出数据，然而输出样本数据为
-\begin{equation}
+\begin{equation}\label{eq:4.hatz}
 \hat{z}_{k-1}=y_{k}-\phi_{k}^{T}\hat{\theta}_{k-1}-u_{k-1}
 \end{equation}
 这个非线性估计部分是除去参数估计之后的剩余部分。用单隐层网络加上ELM学习算法得到的估计值是
@@ -325,7 +325,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 
 本课题基于ELM算法估计非参数部分的实施过程依赖和控制密切相关，故具体算法公式将和自适应控制器设计一起在下一节介绍。
 
-\section{自适应控制器设计}
+\section{自适应控制器}\label{sect:4.3}
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.7\textwidth]{ch4-elm-use.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
@@ -333,7 +333,10 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
   \label{fig.elm.use}
 \end{figure}
 
-用信息浓缩估计参数部分，用ELM估计非参数部分，如图\ref{fig.elm.use}。在前面两种算法的基础上，可以设计出半参数自适应控制器，主要包含两个过程，即初始化阶段和自适应控制阶段。在初始化阶段，需要完成信息浓缩估计器关联先验信息设置相关参数集的任务，以及ELM学习算法的网络参数初始化任务；自适应控制阶段前半段主要是参数估计，后半段主要是神经网络的学习更新非参数部分的估计，从而产生合适的控制输入，完成轨迹跟踪任务。下面介绍具体实施流程，其中信息浓缩估计部分直接针对二维参数情形设计。
+\subsection{算法设计}\label{sect:4.3.1}
+用信息浓缩估计参数部分，用ELM估计非参数部分，如图\ref{fig.elm.use}。在前面两种算法的基础上，可以设计出半参数自适应控制器，主要包含两个过程，即初始化阶段和自适应控制阶段。在初始化阶段，需要完成信息浓缩估计器关联先验信息设置相关参数集的任务，以及ELM学习算法的网络参数初始化任务；自适应控制阶段前半段主要是参数估计，后半段主要是神经网络的学习更新非参数部分的估计，从而产生合适的控制输入，完成轨迹跟踪任务。
+
+控制的目标是使得系统\ref{eq:4.semi-u}跟踪上期望的轨迹$y^{*}_{k},\ k\geq0$。下面介绍具体实施流程，其中信息浓缩估计部分直接针对二维参数情形设计。
 
 \begin{enumerate}%
 %1
@@ -372,7 +375,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \item \textbf{自适应控制阶段}
 \begin{enumerate}%
 %2.a
-\item 获得系统在第$k$个时刻的输出值$y_{k}$，并计算$e_{k,1}$和$e_{k,2}$.
+\item 获得系统在第$k$个时刻的输出值$y_{k}$，并利用第二章的公式\eqref{eq.fk}计算$v_{k,1}$和$v_{k,2}$.
 %2.b
 \item 用第三章的公式得到当前的多边形区域$C_{k}$，并将$C_{k}$的中心作为当前参数估计值$\hat{\bm{\theta}}_{k}$.
 %2.c
@@ -382,7 +385,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 %2.e
 \item 如果$\gamma=1$那么执行(i); 否则，执行(ii).
 \begin{enumerate}%
-\item \emph{Updating:} 将$(\bm{\psi}_{k-1},\hat{z}_{k-1})$作为SLFN的输入输出样本数据，计算网络的隐含层输出$H_{k-1}$，并使用下面的等式计算隐含层到输出层的权重
+\item Updating：将$(\bm{\psi}_{k-1},\hat{z}_{k-1})$作为SLFN的输入输出样本数据，计算网络的隐含层输出$H_{k-1}$，并使用下面的等式计算矩阵$P_{k}$和隐含层到输出层的权重
 \begin{equation}\label{eq.elmk}
 \begin{split}%
 P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{T}(\rho\\
@@ -390,7 +393,7 @@ P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{T}(\rho\\
 \beta^{k}=&\beta^{k-1} + P_{k-1}H_{k-1}^{T}(\hat{z}_{k-1}-H_{k-1}\beta^{k-1})
 \end{split}
 \end{equation}
-\item \emph{Relearning:}执行在初始化阶段的步骤1-(c),1-(d),1-(e).
+\item Relearning：执行在初始化阶段的步骤1-(c),1-(d),1-(e).
 \end{enumerate}
 \item 将$\bm{\psi}_{k}$作为SLFN的输入向量，并计算隐含层的输出矩阵$H_{k}$，从而得到非参数的估计
 \begin{equation}\label{eq.hat.z.k}
@@ -404,6 +407,23 @@ u_{k}=y^{*}_{k+1}-\phi_{k}^{T}\hat{\bm{\theta}}_{k}-\breve{z}_{k}
 \end{enumerate}
 \end{enumerate}
 
+\subsection{稳定性分析}\label{sect:4.3.2}
+下面针对系统\ref{eq:4.semi-u}和半参数自适应控制算法分析闭环特性。系统在$k+1$时刻的期望输出为$y^{*}_{k+1}$，实际输出值为$y_{k+1}$，则跟踪误差定义为
+\begin{equation}
+e_{k+1} = y_{k+1} - y^{*}_{k+1}.
+\end{equation}
+从方程\eqref{eq:4.semi-u}, \eqref{eq:4.hatz}和\eqref{eq.4:u}，容易得到
+\begin{equation}\label{eq:4.stab}
+\begin{split}%
+e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
+& = y_{k+1} - \hat{y}_{k+1} + \hat{y}_{k+1} - y^{*}_{k+1}\\
+& = (y_{k+1} - \phi_{k}^{T}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )\\
+& + (\phi_{k}^{T}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
+& = \phi_{k}\theta_{k} + z_{k} - \phi_{k}^{T}\hat{\theta}_{k} - \breve{z}_{k}\\
+& = \phi_{k}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})
+\end{split}
+\end{equation}
 \section{仿真实例}
+仿真对象如下：
 
 \section{本章总结}

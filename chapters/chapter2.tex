@@ -173,8 +173,8 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 
 有一种十分典型的情形，如同在上述的提出背景\ref{subsect:2.3.1}中描述的$z_{k}\in V_{k}$是区间的形式。具体数学描述为
 \begin{eqnarray}%
-\underline{\theta}_{n}\leq\theta_{n}\leq\overline{\theta}_{n}\\
-\underline{z}\leq z_{k}\geq\overline{z}
+&\underline{\theta}_{n}\leq\theta_{n}\leq\overline{\theta}_{n}\\
+&\underline{z}\leq z_{k}\geq\overline{z}
 \end{eqnarray}
 这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\omega{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
 
@@ -261,23 +261,23 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \begin{equation}%
 \label{eq.nq.d2}
 \begin{split}%
-\bm{\phi_{k-1}}^{T}&\cdot\bm{\theta}\leq e_{k,1}\\
-(-\bm{\phi_{k-1}}^{T})&\cdot\bm{\theta}\leq e_{k,2}
+\bm{\phi_{k-1}}^{T}&\cdot\bm{\theta}\leq v_{k,1}\\
+(-\bm{\phi_{k-1}}^{T})&\cdot\bm{\theta}\leq v_{k,2}
 \end{split}
 \end{equation}
 其中
 \begin{equation}%
 \label{eq.fk}
 \begin{split}%
-e_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
-e_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
+v_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
+v_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 \end{split}
 \end{equation}
 本文称\eqref{eq.nq.d2}为线性约束。和$d_{1}=1$情形类似，可以得到信息约束的递推形式为
 \begin{equation}%
 \begin{split}%
-\Gamma_{k-1}'&=G(\Gamma_{k-1},\bm{\phi_{k-1}},e_{k,1})\\
-\Gamma_{k}&=G(\Gamma_{k-1}',\bm{\phi_{k-1}},e_{k,2})
+\Gamma_{k-1}'&=G(\Gamma_{k-1},\bm{\phi_{k-1}},v_{k,1})\\
+\Gamma_{k}&=G(\Gamma_{k-1}',\bm{\phi_{k-1}},v_{k,2})
 \end{split}
 \end{equation}
 这里$G(\Gamma,\bm{\phi},f)$代表一种变换（算法），它表示在初始的多面体$\Gamma$中加入一个线性约束条件$\bm{\phi}\cdot\bm{\theta}\leq e$。
