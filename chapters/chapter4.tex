@@ -420,10 +420,37 @@ e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
 & = (y_{k+1} - \phi_{k}^{T}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )\\
 & + (\phi_{k}^{T}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
 & = \phi_{k}\theta_{k} + z_{k} - \phi_{k}^{T}\hat{\theta}_{k} - \breve{z}_{k}\\
-& = \phi_{k}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})
+& = \phi_{k}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})\\
+& = \phi_{k}\tilde{\bm{\theta}}_{k}+\tilde{z}_{k}
 \end{split}
 \end{equation}
+从上面的方程\eqref{eq:4.stab}可以看出，如果参数部分和非参数部分的估计误差收敛到零，那么跟踪误差也收敛到零。前面一章设计的信息浓缩估计可以保证未知参数估计收敛到零，并且本章的ELM估计非参数部分也可以保证收敛性，因此，本章设计的半参数自适应控制器可以保证渐进稳定性。
+
 \section{仿真实例}
-仿真对象如下：
+本章验证自适应控制器的性能，选择仿真如下对象
+\begin{equation}\label{eq:4.plant}
+y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \omega_{k+1} 
+\end{equation}
+其中，系统的未知参数和未知函数设定为
+\begin{equation}\label{eq:4.}
+\begin{split}
+&\theta_{1} = -1,\ \theta_{2} = 1\\
+&f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
+\end{split}
+\end{equation}
+同时未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象是二维参数和二维非参数情形，即$p_{1}=2$同时$q_{2}=2$。系统的先验信息描述为
+\begin{equation}\label{eq.4:aprior}
+\begin{split}
+&\underline{f}(\phi_{k})=-3,\ \overline{f}(\phi_{k})=4\\
+&B_{w}=0.1\\
+&\underline{B}_{\theta,1}=-10,\ \overline{B}_{\theta,1}=10\\
+&\underline{B}_{\theta,2}=-10,\ \overline{B}_{\theta,1}=15
+\end{split}
+\end{equation}
+
+为了更好的验证半参数自适应控制器的性能，本章选取了经典的自适应控制算法，即自校正控制器（STR）作为对比算法。自校正控制器（或者自校正调节器）采用最小二乘算法（RLS）估计未知参数。线性部分为
+\begin{equation}\label{eq:4.zrls}
+\phi_{k}^{T}\theta=y_{k+1}-u_{k}-\hat{z}_{RLS}
+\end{equation}
 
 \section{本章总结}
