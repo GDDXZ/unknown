@@ -212,12 +212,8 @@ y_{k+1}=\theta_{1}\cdot y_{k} +\theta_{2}\cdot y_{k-1}+u_{k}+\omega_{k+1}+\sin(\
 \end{equation*}
 因此，合并得到
 \begin{equation*}
-\begin{split}%
-&\underline{z}=-3\\
-&\overline{z}=4
-\end{split}
+\underline{z}=-3,\ \overline{z}=4
 \end{equation*}
-
 初始的参数集合取为
 \begin{equation*}%
 \Theta=\{-1\leq\theta_{1}\leq1,\ -1\leq\theta_{2}\leq1\}
@@ -275,6 +271,7 @@ C_{\infty}=\bigcap\limits_{k=1}^{\infty} C_{k}\subseteq \hat{C}_{\infty}
 \item 具体实施比较灵活，主要取决于先验信息的具体表现形式，这也给算法的优化带来了极大的提升空间。例如为了降低计算复杂度，可以用上节讨论的“松实现”。
 \item 不像传统辨识算法一样，在某些时候表现出随着时间的推移，估计值漂移或者精度下降的现象。相反，数据越多，估计越准确。
 \end{enumerate}
+
 一般事物总存在两面性，经过分析，信息浓缩估计算法也存在如下问题：
 \begin{enumerate}
 \item 难以利用系统干扰项的先验信息，特别是无界随机干扰。也许在这种没有非参数不确定性且随机干扰是无界噪声序列时，传统基于值估计的算法表现得更加适合。

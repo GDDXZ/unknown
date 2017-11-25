@@ -5,11 +5,12 @@
 %%==================================================
 \chapter{离散时间半参数自适应控制}\label{chap:4}
 自适应控制中的的辨识是为了控制问题，上一章设计了二维情形下的信息浓缩估计算法去辨识线性部分的未知参数。本章将在第三章的基础上设计非参数部分的估计算法，主要借助于一种机器学习算法，然后根据两部分的估计结果去设计自适应控制律在去解决随动控制问题。
+
 \section{问题描述}\label{sect:4.1}
 再次考虑第二章给出的半参数模型
 \begin{equation}%
 \label{eq:4.semi-u}
-y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{psi}_{k}})+\omega_{k+1}
+y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{\psi}_{k}})+\omega_{k+1}
 \end{equation}
 其中，$\bm{\theta}$是未知参数向量，$f(\cdot)$是未知函数。同理，令
 \begin{equation}
@@ -17,6 +18,23 @@ z_{k} = f(\bm{\psi}_{k}) + \omega_{k+1}
 \end{equation}
 
 针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\omega_{k+1}$的先验信息，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
+
+本章针对系统\eqref{eq:4.semi-u}有如下先验信息：
+\begin{itemize}
+\item 期望跟踪信号$\{y_{k}^{*}\}$是有界的，即存在有界正常数$B_{yd}$，使得
+\begin{equation}\label{eq:4.ydB}
+|y_{k}^{*}|\leq B_{yd},\ \forall k\geq0.
+\end{equation}
+\item $\bm{\theta}$各分量是有界的，即$\underline{\theta}_{j}\leq\theta_{j}\leq\overline{\theta}_{j}$，其中$\underline{\theta}_{j}$和$\overline{\theta}_{j}$为已知的常数，$j=1,2,\ldots,p_{1}$.
+\item 噪声序列$\omega_{k}$的取值在一个已知的范围内，即
+\begin{equation}\label{eq:4.wB}
+\underline{\omega}\leq\omega_{k}\leq\overline{\omega}\,\ \forall k\geq0.
+\end{equation}
+\item 未知函数$f(\cdot)$的上下界受限于其他已知函数，即
+\begin{equation}\label{eq:4.fB}
+\underline{f}(\bm{\psi})\leq f(\bm{\psi})\leq \overline{f}(\bm{\psi}).
+\end{equation}
+\end{itemize}
 
 第三章已经给出了$\bm{\theta}$的估计算法，因此剩下的部分可以分为两个核心问题，一方面是设计$f(\cdot)$的估计算法，另一方面是设计控制输入$u_{k}$的表达式。假设第二章设计出的未知参数的估计值为$\hat{\bm{\theta}}_{k}$，下面需要设计出$\breve{z}_{k}$的表达式。因此，根据必然等价原理，设计出的控制输入的一般表达式为：
 \begin{equation}\label{eq:4.uk}
@@ -424,33 +442,100 @@ e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
 & = \phi_{k}\tilde{\bm{\theta}}_{k}+\tilde{z}_{k}
 \end{split}
 \end{equation}
-从上面的方程\eqref{eq:4.stab}可以看出，如果参数部分和非参数部分的估计误差收敛到零，那么跟踪误差也收敛到零。前面一章设计的信息浓缩估计可以保证未知参数估计收敛到零，并且本章的ELM估计非参数部分也可以保证收敛性，因此，本章设计的半参数自适应控制器可以保证渐进稳定性。
+从上面的方程\eqref{eq:4.stab}可以看出，如果参数部分和非参数部分的估计误差$\tilde{\bm{\theta}}_{k}$和$\tilde{z}_{k}$收敛到零，那么跟踪误差$e_{k+1}$也收敛到零。前面一章设计的信息浓缩估计可以保证未知参数估计收敛到零，并且本章的ELM估计非参数部分也可以保证收敛性，因此，本章设计的半参数自适应控制器可以保证渐进稳定性。
 
-\section{仿真实例}
-本章验证自适应控制器的性能，选择仿真如下对象
+\section{仿真实例}\label{sect:4.4}
+
+\subsection{仿真环境}\label{sect:4.4.1}
+本章验证自适应控制器的性能，选择仿真如下半参数被控对象
 \begin{equation}\label{eq:4.plant}
 y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \omega_{k+1} 
 \end{equation}
 其中，系统的未知参数和未知函数设定为
-\begin{equation}\label{eq:4.}
+\begin{equation}
 \begin{split}
 &\theta_{1} = -1,\ \theta_{2} = 1\\
 &f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
 \end{split}
 \end{equation}
-同时未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象是二维参数和二维非参数情形，即$p_{1}=2$同时$q_{2}=2$。系统的先验信息描述为
+同时，未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象是二维参数和二维非参数情形，即$p_{1}=2$同时$q_{2}=2$。系统可利用的先验信息在数学上描述为
 \begin{equation}\label{eq.4:aprior}
 \begin{split}
-&\underline{f}(\phi_{k})=-3,\ \overline{f}(\phi_{k})=4\\
-&B_{w}=0.1\\
-&\underline{B}_{\theta,1}=-10,\ \overline{B}_{\theta,1}=10\\
-&\underline{B}_{\theta,2}=-10,\ \overline{B}_{\theta,1}=15
+&\underline{f}(\psi_{k})=-3,\ \overline{f}(\psi_{k})=4\\
+&\underline{\omega}=-0.1,\ \overline{\omega}=0.1\\
+&\underline{\theta}_{1}=-10,\ \overline{\theta}_{1}=10\\
+&\underline{\theta}_{2}=-10,\ \overline{\theta}_{2}=15
 \end{split}
 \end{equation}
 
-为了更好的验证半参数自适应控制器的性能，本章选取了经典的自适应控制算法，即自校正控制器（STR）作为对比算法。自校正控制器（或者自校正调节器）采用最小二乘算法（RLS）估计未知参数。线性部分为
-\begin{equation}\label{eq:4.zrls}
-\phi_{k}^{T}\theta=y_{k+1}-u_{k}-\hat{z}_{RLS}
-\end{equation}
+为了更好的验证半参数自适应控制器的性能，本章选取了经典的自适应控制算法，即自校正控制器（STR）作为对比算法。自校正控制器（或者自校正调节器）采用最小二乘算法（RLS）估计未知参数。不过由于RLS针对的是线性系统，而本章要控制的对象是\eqref{eq:4.plant}是非线性的。对比仿真实验的唯一控制变量在于自适应控制算法，因此先验信息\eqref{eq.4:aprior}对于STR同样可以利用，需要对原生的RLS估计进行简单的改进，补偿掉非线性部分。
 
-\section{本章总结}
+对比方法RLS实际估计的线性部分为
+\begin{equation}\label{eq:4.zrls}
+L_{k}\triangleq\theta_{1}y_{k} + \theta_{2} y_{k-1}=y_{k+1}-u_{k}-\hat{z}_{RLS}
+\end{equation}
+其中，$\hat{z}_{RLS}$是STR实施过程中对非线性部分的一个粗略估计，用来补偿掉非线性部分，具体值可取
+\begin{equation}\label{eq:4.zhatrls}
+\hat{z}_{RLS}=\frac12 (\underline{f}(\psi_{k})+\overline{f}(\psi_{k})) 
+\end{equation}
+RLS估计算法也包括两个过程，第一个是初始化过程确定初始值，即
+\begin{equation}\label{eq:4.rls.0}
+\begin{split}
+&\bm{\pi}_{0}=\alpha \bm{I}_{p_{1}}\\
+&\bm{\theta}^{0}=[0.1,\dots,0.1]
+\end{split}
+\end{equation}
+$\alpha$一般取较大的数（$10^{4}$~$10^{8}$）。第二阶段是递推过程，每一步都会改变$\bm{\theta}$和$\bm{\pi}^{0}$的值。第$k$时刻的估计为
+\begin{equation}\label{eq:4.rls.k}
+\begin{split}
+\hat{\bm{\theta}}_{k}&=\hat{\bm{\theta}}_{k-1}+ \zeta_{k} \bm{\pi}_{k-1} \bm{\phi}_{k} (L_{k}-\bm{\phi}_k^\tau \bm{\theta}_{k-1})\\
+\zeta_k&=(1+\bm{\phi}_{k}^{\tau} \bm{\pi}_{k-1} \bm{\phi}_{k})^{-1}\\
+\bm{\pi}_{k}&=\bm{\pi}_{k-1}-\zeta_k \bm{\pi}_{k-1} \bm{\phi}_{k} \bm{\phi}_{k}^{\tau} \bm{\pi}_{k-1}
+\end{split}
+\end{equation}
+方程\eqref{eq:4.zhatrls}到\eqref{eq:4.rls.k}就是本章对比仿真采用的RLS算法。
+
+\subsection{仿真结果}\label{sect:4.4.2}
+设定的期望跟踪信号为
+\begin{equation}\label{eq:4.sim.yd}
+y_{k}^{*} = 1.5\sin(2\bm{\pi} k\times T_{s})
+\end{equation}
+其中，控制周期为$T_{s}=0.01$s。仿真半参数自适应控制和自校正控制算法，得到系统的输出曲线分别为\ref{fig.sim.elm.sys}和\ref{fig.sim.str.sys}。在图\ref{fig.sim.elm.sys}中，可以看出半参数自适应控制的轨迹跟踪精度比较好，系统的实际输出很快的跟踪上了期望的输出，误差逐渐收敛到一个很小的范围。相反，自校正控制的跟踪效果就较差，经过一段时间后，系统的实际输出和期望值偏差仍然较大，如图\ref{fig.sim.str.sys}所示。在本节的仿真实例中，自适应控制的输出跟踪误差在自校正控制的基础上减少了大约10倍。
+\begin{figure}[!htb]
+	\centering
+	\subfigure[输出轨迹]{\includegraphics[width=0.65\textwidth ]{ch4-sim-elm-y.png}\label{fig.sim.elm.y}}\\
+	\subfigure[跟踪误差]{\includegraphics[width=0.65\textwidth ]{ch4-sim-elm-yerror.png}\label{fig.sim.elm.ye}}
+	%\subfigure[控制输入]{\includegraphics[width=0.5\textwidth ]{ch4-sim-elmu.png}\label{fig.sim.elm.u}}
+	\caption{系统输出结果：半参数自适应控制算法}
+	\label{fig.sim.elm.sys}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\subfigure[输出轨迹]{\includegraphics[width=0.65\textwidth ]{ch4-sim-str-y.png}\label{fig.sim.str.y}}\\
+	\subfigure[跟踪误差]{\includegraphics[width=0.65\textwidth ]{ch4-sim-str-yerror.png}\label{fig.sim.str.ye}}
+	%\subfigure[控制输入]{\includegraphics[width=0.5\textwidth ]{ch4-sim-elmu.png}\label{fig.sim.elm.u}}
+	\caption{系统输出结果：自校正控制算法}
+	\label{fig.sim.str.sys}
+\end{figure}
+
+造成跟踪控制效果较大差异的重要原因之一，就是两种控制算法中对系统参数估计算法的不同，图\ref{fig.sim.str.sys}展示了仿真得到的参数估计曲线。相对于图\ref{fig.sim.str.theta}中改进的最小二乘算法来说，图\ref{fig.sim.elm.theta}的信息浓缩估计参数估计比较准确。
+\begin{figure}[!htb]
+	\centering
+	\subfigure[信息浓缩估计]{\includegraphics[width=0.65\textwidth ]{ch4-sim-elm-theta.png}\label{fig.sim.elm.theta}}\\
+	\subfigure[改进的最小二乘估计]{\includegraphics[width=0.65\textwidth ]{ch4-sim-str-theta.png}\label{fig.sim.str.theta}}
+	\caption{未知参数估计结果对比}
+	\label{fig.sim.str.sys}
+\end{figure}
+
+除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig.sim.elm.f}。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明了引入超限学习机这种机器学习算法大大较少系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.1毫秒以内，基本能够满足基于工业PC的控制系统对实时性的要求。
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.7\textwidth ]{ch4-sim-elm-f.png}\\
+% e.g.,[scale=0.75], [width=0.75\textwidth ]
+  \caption{半参数自适应控制中超限学习机对非参数部分的估计结果}
+  \label{fig.sim.elm.f}
+\end{figure}
+
+\section{本章总结}\label{sect:4.5}
+本章主要设计了基于超限学习机的非线性估计和半参数自适应控制。首先给出了半参数系统的轨迹跟踪问题的数学描述，并分析了半参数模型的自适应估计和控制问题；然后介绍了超限学习机的主要思想、算法特点和改进算法，并用合适的超限学习机变体算法设计了非参数部分的估计算法；接着在信息浓缩和超限学习机的自适应估计基础上，设计了针对半参数系统轨迹跟踪问题的自适应控制器，并分析了闭环跟踪稳定性；最后用仿真实例测试和验证本章设计的半参数自适应控制算法的性能，用改进的自校正控制算法作对比。
