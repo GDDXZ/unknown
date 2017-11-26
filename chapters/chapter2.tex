@@ -13,12 +13,12 @@
 最开始关于反馈机制的研究始于一类基本的不确定非线性系统，即下面的模型
 \begin{equation}%
 \label{eq:Guo1}
-y_{k+1} = \theta \phi_{k} + u_{k} + \omega_{k+1},\ \phi_{k}=O(y_{k}^{b}),\ b>0
+y_{k+1} = \theta \phi_{k} + u_{k} + \epsilon_{k+1},\ \phi_{k}=O(y_{k}^{b}),\ b>0
 \end{equation}
-其中，$u_{k}$和$y_{k}$分别是系统在$k$时刻的输入和输出，一般假定$\omega_{k}$为高斯白噪声干扰。$\theta$是未知参数，$b$刻画了系统非线性的增长速率。除了参数不确定性$\theta$外，系统\eqref{eq:Guo1}的不确定性主要表现为$\phi_{k}$的未知性，即非参数不确定性。经过严格的数学证明，当$b\geq4$时，不存在任何的自适应反馈控制律使得系统\eqref{eq:Guo1}满足全局稳定。进一步考虑如下的系统：
+其中，$u_{k}$和$y_{k}$分别是系统在$k$时刻的输入和输出，一般假定$\epsilon_{k}$为高斯白噪声干扰。$\theta$是未知参数，$b$刻画了系统非线性的增长速率。除了参数不确定性$\theta$外，系统\eqref{eq:Guo1}的不确定性主要表现为$\phi_{k}$的未知性，即非参数不确定性。经过严格的数学证明，当$b\geq4$时，不存在任何的自适应反馈控制律使得系统\eqref{eq:Guo1}满足全局稳定。进一步考虑如下的系统：
 \begin{equation}%
 \label{eq:Guo2}
-y_{k+1} = f(y_{k}) + u_{k} + \omega_{k+1},\ f(\dot)\in F(L)
+y_{k+1} = f(y_{k}) + u_{k} + \epsilon_{k+1},\ f(\dot)\in F(L)
 \end{equation}
 其中，$f(\cdot)$是未知函数，$F(L)$代表一类满足Lipschitz条件的非线性函数。对于这种非参数不确定性系统，有如下结论\upcite{XieGuo2000}：如果$L<\frac32+\sqrt{2}$，则存在反馈控制律使得系统\eqref{eq:Guo2}全局稳定；相反，若$L\geq\frac32+\sqrt{2}$，则不存在反馈控制律使得系统\eqref{eq:Guo2}全局稳定。$f(\cdot)$的绝对值随自变量$y_{k}$绝对值的增长速率决定了反馈机制能力的上限。
 
@@ -31,7 +31,7 @@ y_{k+1} = f(y_{k}) + u_{k} + \omega_{k+1},\ f(\dot)\in F(L)
 虽然数字化控制器输出到被控对象的信号是离散时间，但是实际的过程是连续时间变化的。一般的离散时间非线性控制往往忽略了这一点，就导致这些研究侧重于理论和离散时间仿真分析。再次考虑下面的NARX系统
 \begin{equation}%
 \label{eq:1.NARX2}
-y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_{k+1}
+y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\epsilon_{k+1}
 \end{equation}
 在系统\eqref{eq:1.NARX2}中，把被控对象当成完全非线性模型，忽略了他们的线性特性，也就是说很多被控对象虽然具有较大的不确定性，但是在一定程度上是可以当作线性对象处理，只不过同时具有非线性部分，导致实际的线性部分参数与理论值有较大的偏差；对于不确定性系统，也就常常表现为同时具有参数不确定性和非参数不确定性。例如电机伺服系统简化处理就是一个二阶线性模型，一般的PID控制也可以获得还算不错的效果；只不过是在负载未知、快时变，或者一些难以建模的非线性动态特性如摩擦等严重的情况下，应用传统的PID控制电机伺服系统时，其效果才会大打折扣。
 
@@ -40,7 +40,7 @@ y_{k+1} = f(y_{k},y_{k-1},\ldots,y_{k+1-p},u_{k},u_{k-1},\ldots,u_{k-q})+\omega_
 首先考虑如下一类半参数模型
 \begin{equation}%
 \label{eq:semi-u}
-y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1}
+y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\epsilon_{k+1}
 \end{equation}
 其中，$y_{k}$，$u_{k}$分别表示系统在$k$时刻的输出和输入，由它们的历史数据组成的回归向量$\bm{\phi_{k}}$和$\bm{\psi_{k}}$具体定义如下:
 \begin{eqnarray}
@@ -54,7 +54,7 @@ d_{2}=p_{2}+q_{2}
 \end{eqnarray}
 分别代表了回归向量$\bm{\phi_{k}}$和$\bm{\psi_{k}}$的维数。
 
-系统的输出$y_{k}$对应到实际的伺服电机系统中可能就是需要控制的电机转速或者位置等物理量，而$u_k$可能就是控制电流（或者控制力矩）等。$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\omega_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\omega_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、$\Theta$是向量集合、$\Delta_{k}$是普通的数值集合。
+系统的输出$y_{k}$对应到实际的伺服电机系统中可能就是需要控制的电机转速或者位置等物理量，而$u_k$可能就是控制电流（或者控制力矩）等。$\bm{\theta}\in\Theta$是未知参数向量，$f(\cdot)\in\mathcal{F}$是未知函数，$\epsilon_{k}\in\Delta_{k}$是外部随机干扰；这里$\Theta$，$\mathcal{F}$，$\Delta_{k}$分别代表了参数不确定性$\bm{\theta}$，非参数不确定性$f(\cdot)$和随机干扰$\epsilon_{k}$的先验知识。他们都是集合的形式，即\mathcal{F}是函数集合、$\Theta$是向量集合、$\Delta_{k}$是普通的数值集合。
 
 上述的模型\eqref{eq:semi-u}直观地反映了被控系统的参数不确定性和非参数不确定性，综合性和普适性较强。关于不确定性的先验知识也是半参数系统中的组成部分。下面分别对这三个量从数学关系上描述一些先验知识的例子。
 \subsection{先验知识举例}\label{subsect:2.2.2}
@@ -71,7 +71,7 @@ d_{2}=p_{2}+q_{2}
 \item 未知参数向量$\bm{\theta}$和标称向量$\bm{\theta}_{0}$之间的距离取值在一个范围内，即$\|\bm{\theta}-\bm{\theta}_{0}\|\leq r_{0}$，这里$r_{0}$是一个已知的常数。
 \item 未知参数向量的取值有限可数，即$\bm{\theta}$属于某一个已知的集合，$\bm{\theta}\in\{\bm{\theta}_{1},\bm{\theta}_{2},\bm{\theta}_{3},\dots,\}$；
 \item $\dots$
-\end{itemize}
+\end{itemize} 
 \subsubsection{未知函数}\label{subsubsect:2.2.2.2}
 未知函数$f(\cdot)$在实际系统如电机物理系统中，对应可能就是难以建模的非线性摩擦力（力矩）、高频振动特性等。$f(\cdot)$可能存在如下的某种先验知识：
 \begin{itemize}
@@ -85,14 +85,14 @@ d_{2}=p_{2}+q_{2}
 \item $\dots$
 \end{itemize}
 \subsubsection{随机干扰}\label{subsubsect:2.2.2.3}
-随机干扰一般来源于测量误差、未知干扰等，$\omega_{k}$可能存在如下的先验知识：
+随机干扰一般来源于测量误差、未知干扰等，$\epsilon_{k}$可能存在如下的先验知识：
 \begin{itemize}%
-\item $\omega_{k}=0$对于任意的$k\geq0$，这意味着系统不存在随机干扰；
-\item $\omega_{k}$的取值在一个已知的范围内，即上下界已知，$\underline{\omega}\leq\omega_{k}\leq\overline{\omega}$；
-\item $\omega_{k}$的取值受限于其他已知的干扰序列，即$\underline{\omega}_{k}\leq\omega_{k}\leq\overline{\omega}_{k}$；
-\item $\omega_{k}$的取值都来自于一个已知的集合，即$\omega_{k}\in\{e_{1}, e_{2},\ldots,e_{N}\}$；
-\item $\omega_{k}$的统计特性符合某种概率分布；例如$\omega_{k}$是高斯随机过程，则$E(\omega_{k})=0$，$E(\omega_{k}^{2})=\sigma^{2}$；又比如$\omega_{k}$的取值满足均匀分布，即$\omega_{k}\sim U(0,1)$；
-\item $\omega_{k}$是一个衰减的序列，如$\omega_{k}=\frac1{k^{2}}$；
+\item $\epsilon_{k}=0$对于任意的$k\geq0$，这意味着系统不存在随机干扰；
+\item $\epsilon_{k}$的取值在一个已知的范围内，即上下界已知，$\underline{\epsilon}\leq\epsilon_{k}\leq\overline{\epsilon}$；
+\item $\epsilon_{k}$的取值受限于其他已知的干扰序列，即$\underline{\epsilon}_{k}\leq\epsilon_{k}\leq\overline{\epsilon}_{k}$；
+\item $\epsilon_{k}$的取值都来自于一个已知的集合，即$\epsilon_{k}\in\{e_{1}, e_{2},\ldots,e_{N}\}$；
+\item $\epsilon_{k}$的统计特性符合某种概率分布；例如$\epsilon_{k}$是高斯随机过程，则$E(\epsilon_{k})=0$，$E(\epsilon_{k}^{2})=\sigma^{2}$；又比如$\epsilon_{k}$的取值满足均匀分布，即$\epsilon_{k}\sim U(0,1)$；
+\item $\epsilon_{k}$是一个衰减的序列，如$\epsilon_{k}=\frac1{k^{2}}$；
 \item $\dots$
 \end{itemize}
 
@@ -106,20 +106,20 @@ d_{2}=p_{2}+q_{2}
 
 因此由于上面种种因素的存在，需要另辟蹊径解决系统\eqref{eq:semi-u}的参数估计问题，传统的基于数值的估计算法难以利用基于集合的先验知识。
 \subsection{主要思想}\label{subsect:2.3.2}
-为了实现参数估计，需要综合充分利用系统的先验知识。从\ref{subsubsect:2.2.2.1}到\ref{subsubsect:2.2.2.3}介绍的先验知识可以看出，对参数向量$\bm{\theta}$、非参数部分$f(\cdot)$、随机干扰$\omega$等不确定性的等价数学描述一般都是表现为集合的形式，因此设计基于集合的参数估计是一种自然的思路。文献\cite{MaLum2009}中提出的信息浓缩估计就是这样的一类估计算法。
+为了实现参数估计，需要综合充分利用系统的先验知识。从\ref{subsubsect:2.2.2.1}到\ref{subsubsect:2.2.2.3}介绍的先验知识可以看出，对参数向量$\bm{\theta}$、非参数部分$f(\cdot)$、随机干扰$\epsilon$等不确定性的等价数学描述一般都是表现为集合的形式，因此设计基于集合的参数估计是一种自然的思路。文献\cite{MaLum2009}中提出的信息浓缩估计就是这样的一类估计算法。
 
 信息浓缩估计是一种针对离散时间系统的基于集合的参数估计器，其主要思想是从初始的关于参数的先验集合出发，将每一时刻的先验知识都看作是对未知函数和参数的数学约束，然后结合采集到的真实的输入输出数据剔除掉不符合真实数据的取值，逐渐缩小这个先验集合的大小，也就减少了系统的参数不确定性；这样经过足够长的时间和数据筛选之后，理论上可以从参数集合中选择任意值或者根据一定的规则选择最优值作为最终的参数估计。
 
 下面基于数学语言详细解释息浓缩估计器的具体思路。这里再次考虑系统
 \begin{equation}%
 \label{eq:semi-u2}
-y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\omega_{k+1},
+y_{k+1} = \theta^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\psi_{k}})+\epsilon_{k+1},
 \end{equation}
 并记
 \begin{eqnarray}
 \label{eq:zk}
 \begin{split}%
-z_{k} & = f(\psi_{k}) + \omega_{k+1}\\
+z_{k} & = f(\psi_{k}) + \epsilon_{k+1}\\
 & = y_{k}-\psi_{k-1}^{T}\theta-u_{k-1}
 \end{split}
 \end{eqnarray}
@@ -176,7 +176,7 @@ C_{\infty} = \bigcap_{k=0}^{\infty}C_{k};
 &\underline{\theta}_{n}\leq\theta_{n}\leq\overline{\theta}_{n}\\
 &\underline{z}\leq z_{k}\geq\overline{z}
 \end{eqnarray}
-这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\omega{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
+这里，$z_{k}$是\eqref{eq:zk}定义的非参数部分$f(\cdot)$和随机干扰$\epsilon{k}$的和，$z_{k}$的上下界也就是这两个量的上下界的组合。为了便于后面的计算，这里直接考虑他们的组合形式$z_{k}$。
 
 本节首先考虑这种先验知识的系统。文献\cite{MaLum2009}设计了一维情形下$d_{1}=1$的参数估计算法，即$\bm{\theta}$是标量的情形。信息浓缩估计器主要就是求出每一步的参数估计集合$C_{k}$。
 \subsubsection{一维参数算法}\label{subsubsect:2.3.3.1}
@@ -267,7 +267,7 @@ C_{k}=[\underline{h}_{k},\overline{h}_{k}]
 \end{equation}
 其中
 \begin{equation}%
-\label{eq.fk}
+\label{eq:2.v}
 \begin{split}%
 v_{k,1}&=y_{k}-u_{k-1}-\underline{z}\\
 v_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})

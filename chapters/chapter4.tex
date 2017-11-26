@@ -10,14 +10,14 @@
 再次考虑第二章给出的半参数模型
 \begin{equation}%
 \label{eq:4.semi-u}
-y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{\psi}_{k}})+\omega_{k+1}
+y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{\psi}_{k}})+\epsilon_{k+1}
 \end{equation}
 其中，$\bm{\theta}$是未知参数向量，$f(\cdot)$是未知函数。同理，令
 \begin{equation}
-z_{k} = f(\bm{\psi}_{k}) + \omega_{k+1}
+z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 \end{equation}
 
-针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\omega_{k+1}$的先验信息，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
+针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\epsilon_{k+1}$的先验信息，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
 
 本章针对系统\eqref{eq:4.semi-u}有如下先验信息：
 \begin{itemize}
@@ -26,9 +26,9 @@ z_{k} = f(\bm{\psi}_{k}) + \omega_{k+1}
 |y_{k}^{*}|\leq B_{yd},\ \forall k\geq0.
 \end{equation}
 \item $\bm{\theta}$各分量是有界的，即$\underline{\theta}_{j}\leq\theta_{j}\leq\overline{\theta}_{j}$，其中$\underline{\theta}_{j}$和$\overline{\theta}_{j}$为已知的常数，$j=1,2,\ldots,p_{1}$.
-\item 噪声序列$\omega_{k}$的取值在一个已知的范围内，即
+\item 噪声序列$\epsilon_{k}$的取值在一个已知的范围内，即
 \begin{equation}\label{eq:4.wB}
-\underline{\omega}\leq\omega_{k}\leq\overline{\omega}\,\ \forall k\geq0.
+\underline{\epsilon}\leq\epsilon_{k}\leq\overline{\epsilon}\,\ \forall k\geq0.
 \end{equation}
 \item 未知函数$f(\cdot)$的上下界受限于其他已知函数，即
 \begin{equation}\label{eq:4.fB}
@@ -47,7 +47,7 @@ u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{T}\cdot\hat{\bm{\theta}}_{k}-\breve{z}_{k}
 前面的章节用信息浓缩估计解决了参数不确定性的辨识问题，半参数自适应控制在提出来的时候，针对非参数部分使用的是最近邻估计。最近邻估计主要针对的是一维参数情形（$d_{1}=1$且$d_{2}=1$），即下面的一维半参数系统
 \begin{equation}%
 \label{eq:4.1ord}
-y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\omega_{k+1}
+y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\epsilon_{k+1}
 \end{equation}
 这里，标量$\theta$是未知的，为参数不确定性部分，同样$f(\cdot)$是非参数不确定性部分，满足Lipschitz条件。最近邻估计不显示地估计$f(\cdot)$部分，而是直接估计
 \begin{equation}\label{eq:4.nne.g}
@@ -89,7 +89,7 @@ $i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等
 
 最后基于设计出下面的控制律
 \begin{equation}\label{eq:4.uk}
-u_{t}=\left\{
+u_{k}=\left\{
 \begin{array}{cc}
   -\hat \eta_k+y_{k+1}^* & \text{if } |y_k-y_{i_k}|\le D \\
   -\hat \eta_k+\frac12(\bar b_k+\underline b_k) & \text{if } |y_k-y_{i_k}|> D \\
@@ -252,7 +252,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 
 \begin{figure}
  \centering
- \includegraphics[width=0.75\textwidth]{ch1-ELM.png}
+ \includegraphics[width=0.7\textwidth]{ch1-ELM.png}
  \caption{超限学习机的网络结构（单隐层前馈型）和算法流程}\label{fig:elm}
 \end{figure}
 
@@ -324,7 +324,7 @@ u_{k}=\frac{y_{k+1}^{*}-\hat{g}(\bm{x}_{k})}{\hat{\phi}(\bm{x}_{k})}
 
 下面借助ITF-OELM来解决本课题的非参数部分的估计问题。首先要确定的是网络的输入输出样本数据。本文要估计的非线性部分为
 \begin{equation}
-z_{k} = f(\bm{\psi}_{k}) + \omega_{k+1}
+z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 \end{equation}
 因此，神经网络的输入是$d_{2}=p_{2}+q_{2}$维向量
 $$\bm{\psi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{2}},u_{k-1},\dots,u_{k-q_{2}+1}]^{T}$$
@@ -346,7 +346,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \section{自适应控制器}\label{sect:4.3}
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.7\textwidth]{ch4-elm-use.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+  \includegraphics[width=0.55\textwidth]{ch4-elm-use.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
   \caption{半参数自适应控制系统中采用的单隐层前馈网络结构}
   \label{fig.elm.use}
 \end{figure}
@@ -449,7 +449,7 @@ e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
 \subsection{仿真环境}\label{sect:4.4.1}
 本章验证自适应控制器的性能，选择仿真如下半参数被控对象
 \begin{equation}\label{eq:4.plant}
-y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \omega_{k+1} 
+y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \epsilon_{k+1} 
 \end{equation}
 其中，系统的未知参数和未知函数设定为
 \begin{equation}
@@ -462,7 +462,7 @@ y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \omeg
 \begin{equation}\label{eq.4:aprior}
 \begin{split}
 &\underline{f}(\psi_{k})=-3,\ \overline{f}(\psi_{k})=4\\
-&\underline{\omega}=-0.1,\ \overline{\omega}=0.1\\
+&\underline{\epsilon}=-0.1,\ \overline{\epsilon}=0.1\\
 &\underline{\theta}_{1}=-10,\ \overline{\theta}_{1}=10\\
 &\underline{\theta}_{2}=-10,\ \overline{\theta}_{2}=15
 \end{split}
@@ -528,7 +528,7 @@ y_{k}^{*} = 1.5\sin(2\bm{\pi} k\times T_{s})
 	\label{fig.sim.str.sys}
 \end{figure}
 
-除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig.sim.elm.f}。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明了引入超限学习机这种机器学习算法大大较少系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.1毫秒以内，基本能够满足基于工业PC的控制系统对实时性的要求。
+除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig.sim.elm.f}。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明了引入超限学习机这种机器学习算法大大较少系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.1毫秒以内，基本能够满足基于工业PC的控制系统对实时性的要求。网络学习过程并没有引入一般深度网络依赖的并行计算等复杂设计，有利于在工业嵌入式系统中实现。
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.7\textwidth ]{ch4-sim-elm-f.png}\\
