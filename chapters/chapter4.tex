@@ -453,10 +453,10 @@ y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \epsi
 \end{equation}
 其中，系统的未知参数和未知函数设定为
 \begin{equation}
-\begin{split}
-&\theta_{1} = -1,\ \theta_{2} = 1\\
-&f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
-\end{split}
+\begin{array}{c}
+\theta_{1} = -1,\ \theta_{2} = 1\\
+f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
+\end{array}
 \end{equation}
 同时，未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象是二维参数和二维非参数情形，即$p_{1}=2$同时$q_{2}=2$。系统可利用的先验信息在数学上描述为
 \begin{equation}\label{eq.4:aprior}
