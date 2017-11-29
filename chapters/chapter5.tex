@@ -18,7 +18,7 @@
 
 工程应用中由于建模和测量的不准确，加上负载的变化以及外部扰动的影响，实际上难以获得机器人精确完整的运动学模型。因此机器人的控制系统中存在的不确定性因素主要可以分为两类，第一类是参数不确定性，如负载质量、连杆长度、连杆质心等物理量未知或部分已知；第二类是非参数不确定性，如高频未建模动态，包括驱动器动力学、结构共振模式，以及低频难以建模动态，如动态/静态摩擦力、关节柔性等。
 
-图\ref{fig.robot}的机器人具有六个自由度，分别由六个关节J1~J的执行机构实现。在无障碍情形下，理论上该机器人的末端可以实现空间任意的位姿，其精度主要表现在任务空间（某个笛卡尔空间）的定位精度。工业高性能的应用场合中，一般要求机器人能达到毫米级的定位精度。机器人的位置控制问题最终要驱动各个关节的电机运动，然后经过减速器等传动机构来实现，伺服电机的运动控制与定位精度是影响机器人末端定位精度的关键因素。
+图\ref{fig.robot}的机器人具有六个自由度，分别由六个关节J1~J2的执行机构实现。在无障碍情形下，理论上该机器人的末端可以实现空间任意的位姿，其精度主要表现在任务空间（某个笛卡尔空间）的定位精度。工业高性能的应用场合中，一般要求机器人能达到毫米级的定位精度。机器人的位置控制问题最终要驱动各个关节的电机运动，然后经过减速器等传动机构来实现，伺服电机的运动控制与定位精度是影响机器人末端定位精度的关键因素。
 
 \subsection{伺服电机控制}\label{chap:5.1.2}
 目前大多数科研、教学和工业应用的机器人都是电力驱动的，一般可分为电压控制和电流控制两种，永磁同步交流伺服电机驱动已成为高性能伺服系统的主要发展方向。对于中小功率机械臂（比如图\ref{fig.robot}所示的协作机器人）的电机建模来说，一般考虑电流控制情形，即电机具有如下的数学模型：
@@ -137,7 +137,7 @@ u_{k} = \frac{1}{\hat{\theta}_{1}}(y^{*}_{k+1}-\hat{\theta}_{2}y_{k}-\breve{z}_{
 \end{figure}
 
 \section{仿真实例}
-本节以图\ref{fig.robot}所示的机器人第二轴J2安装的伺服电机控制为例验证本章设计的半参数自适应运动控制算法的性能。该伺服电机属于日本松下A6系列全数字式交流伺服电机，具体型号为MHMF022L1V2M。相关参数如表\ref{tab:motor}所示。
+本节以图\ref{fig.robot}所示的机器人第二轴J2安装的伺服电机控制为例验证本章设计的半参数自适应运动控制算法的性能。该伺服电机属于日本松下A6系列全数字式交流伺服电机，具体型号为MHMF022L1V2M，是一种小功率的交流同步电机。相关参数如表\ref{tab:motor}所示。
 \begin{table}
 \centering
 \caption{电机相关参数}\label{tab:motor}
@@ -164,27 +164,49 @@ $$Q_{0}=-45^{o}=0.524rad,\ Q_{d}=85^{o}=1.484rad$$
 $$Q_{0}=-62.88,\ Q_{d}=178.08$$
 本章用五次多项式插值作为图\ref{fig.control.motor}的轨迹发生器中的轨迹规划算法，可以做到机器人在关节空间的加速度连续且可导，其导数加加速度（有时称之为冲击）连续，其轨迹比较平滑，一般机器人控制器的关节运动都是采用五次多项式插补。在仿真过程中，可以借助于机器人相关工具箱里提供的函数完成插值规划部分。
 
-目前广泛采用的机器人电机驱动通信总线是工业实时以太网EtherCAT，其控制周期一般为0.5ms到10ms之间。为了接近实际情况，本章的电机控制周期取为$T_{s}=1$ms.采用前面设计的半参数自适应控制算法对电机的运动进行轨迹跟踪控制，得到电机系统的输出结果为图\ref{fig.sim.semi.y}，以及过程中的控制输入和非线性部分的估计曲线如图\ref{fig.sim.semi.a}所示。
+目前广泛采用的机器人电机驱动通信总线是工业实时以太网EtherCAT，其控制周期一般为0.5ms到10ms之间。为了接近实际情况，本章的电机控制周期取为$T_{s}=1$ms.采用前面设计的半参数自适应控制算法对电机的运动进行轨迹跟踪控制，事先对于电机如表\ref{tab:motor}所示准确参数未知，只是知道大致范围，在这种情况下检验控制性能。最终得到电机系统的输出结果为图\ref{fig.sim.semi.yye}，以及过程中的控制输入和非线性部分的估计曲线如图\ref{fig.sim.semi.a}所示。轴2在运动过程中关节角度的跟踪误差平均值为$0.0021$rad。对于如图所示的机器人一般的运动过程中的臂长为1m，则机器人末端的跟踪误差$e_{ac}=0.0021m=2.1mm$，跟踪精度在毫米数量级。
 
 \begin{figure}[!htb]
 	\centering
-	\subfigure[第二轴的关节运动速度曲线（经过减速器之后）]{\includegraphics[width=0.65\textwidth ]{ch5-semi-omega.png}\label{fig.sim.elm.y}}\\
-	\subfigure[第二轴的关节角位移曲线（经过减速器之后）]{\includegraphics[width=0.65\textwidth ]{ch5-semi-Q.png}\label{fig.sim.elm.ye}}
+	\subfigure[第二轴的关节运动速度曲线（经过减速器之后）]{\includegraphics[width=0.65\textwidth ]{ch5-semi-omega.png}\label{fig.sim.semi.y}}\\
+	\subfigure[第二轴的关节角位移曲线（经过减速器之后）]{\includegraphics[width=0.65\textwidth ]{ch5-semi-Q.png}\label{fig.sim.semi.ye}}
 	%\subfigure[控制输入]{\includegraphics[width=0.5\textwidth ]{ch4-sim-elmu.png}\label{fig.sim.elm.u}}
-	\caption{半参数自适应控制算法的系统输出结果}
-	\label{fig.sim.semi.y}
+	\caption{半参数自适应控制算法的系统输出结果，关节角度跟踪误差的平均值为$0.0021$rad}
+	\label{fig.sim.semi.yye}
 \end{figure}
 
 \begin{figure}[!htb]
 	\centering
-	\subfigure[第二轴电机系统的非线性部分的估计结果]{\includegraphics[width=0.65\textwidth ]{ch5-semi-f.png}\label{fig.sim.elm.y}}\\
-	\subfigure[第二轴电机系统的控制输入（电流）实际曲线]{\includegraphics[width=0.65\textwidth ]{ch5-semi-u.png}\label{fig.sim.elm.ye}}
+	\subfigure[第二轴电机系统的非参数部分的估计结果]{\includegraphics[width=0.65\textwidth ]{ch5-semi-f.png}\label{fig.sim.elm.f}}\\
+	\subfigure[第二轴电机系统的控制输入（电机电流）实际曲线]{\includegraphics[width=0.65\textwidth ]{ch5-semi-u.png}\label{fig.sim.elm.u}}
 	%\subfigure[控制输入]{\includegraphics[width=0.5\textwidth ]{ch4-sim-elmu.png}\label{fig.sim.elm.u}}
-	\caption{半参数自适应控制算法的运行特性}
+	\caption{半参数自适应控制算法的运行和估计特性曲线}
 	\label{fig.sim.semi.a}
 \end{figure}
 
-另外，采用常规的PID算法进行对比仿真，得到电机系统的输出结果为图\ref{fig.sim.semi.y}，以及过程中的控制输入和非线性部分的估计曲线如图\ref{fig.sim.semi.a}所示。
+另外，采用常规的PID算法进行对比仿真，这里采用的调试PID参数的策略是在电机空载或者小负载以及电机名义标称惯量的情况下调试得到满意的性能，然后加上在机器人负载条件下再次测试。最终得到电机系统的输出结果为图\ref{fig.sim.pid.y}，以及过程中的控制输入（电机电流）曲线如图\ref{fig.sim.pid.u}所示。轴2在运动过程中关节角度的跟踪误差平均值为$0.0207$rad。对于如图所示的机器人一般的运动过程中的臂长为1m，则机器人末端的跟踪误差$e_{pid}=0.0207m=2.07cm$，跟踪精度在厘米数量级。
+\begin{figure}[!htb]
+	\centering
+	\subfigure[第二轴的关节运动速度曲线（经过减速器之后）]{\includegraphics[width=0.65\textwidth ]{ch5-pid-omega.png}\label{fig.sim.pid.y}}\\
+	\subfigure[第二轴的关节角位移曲线（经过减速器之后）]{\includegraphics[width=0.65\textwidth ]{ch5-pid-Q.png}\label{fig.sim.pid.ye}}
+	%\subfigure[控制输入]{\includegraphics[width=0.5\textwidth ]{ch4-sim-elmu.png}\label{fig.sim.elm.u}}
+	\caption{半参数自适应控制算法的系统输出结果，关节角度跟踪误差的平均值为$0.0207$rad}
+	\label{fig.sim.pid.yye}
+\end{figure}
+
+\begin{figure}[!htb]
+	\centering
+	\includegraphics[width=0.5\textwidth ]{ch5-pid-u.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+	\caption{第二轴电机系统的控制输入（电机电流）实际曲线}
+	\label{fig.sim.pid.u}
+\end{figure}
+
+对比上面两种控制方法结果，可以得出本课题采用基于超限学习机的半参数自适应控制算法对于解决运动控制问题有如下特点：
+\begin{enumerate}
+\item 基于超限学习机的半参数自适应控制算法提高了系统的跟踪精度，对比常规的PID控制精度可以提高大约一个数量级（10倍）。
+\item 基于超限学习机的半参数自适应控制对于系统精度提高主要来源于非参数部分的准确估计，而非参数部分的估计在一定程度也依赖于参数部分的估计
+\item 半参数自适应估计的准确性导致最终的控制输入有比较好的变化曲线，对比图\ref{fig.sim.semi.u}和\ref{fig.sim.elm.u}容易得出。
+\end{enumerate}
 
 \section{本章总结}
-本章主要介绍了
+本章主要将基于超限学习机的半参数自适应估计与控制应用到运动轨迹跟踪控制中，解决机器人运动中电机的控制问题。首先分析了机器人轨迹跟踪和伺服电机运动控制中多种不确定性存在等控制难点；然后应用本课题提出的半参数系统对单轴伺服电机进行了分析和建模；接着设计了基于超限学习机的半参数自适应估计与控制算法应用单轴伺服电机的控制；最后设计了仿真对比实验测试和验证半参数自适应控制的性能。
