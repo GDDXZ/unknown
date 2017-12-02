@@ -202,15 +202,17 @@ y_{k}-u_{k-1}-\overline{z}\leq\theta\phi_{k-1}\leq y_{k}-u_{k-1}-\underline{z}.
 &\overline{s}_{k}=\frac{\max(\mathrm{sign}(\phi_{k-1})(y_{k}-u_{k-1}-\overline{z}),\mathrm{sign}(\phi_{k-1})(y_{k}-u_{k-1}-\underline{z}))}{\phi_{k-1}}
 \end{split}
 \end{equation}
-$\mathrm{sign}(\cdot)$是常见的符号函数：
-\begin{equation}%
-\mathrm{sign}(x)=\left\{
-\begin{aligned}
-&1,\ \for x>0\\
-&0,\ \for x=0\\
-&-1,\ \for x<0
-\end{aligned}
+$\mathrm{sign}(\cdot)$是常见的符号函数，定义如下：
 \end{equation}
+\begin{equation}
+\mathrm{sign}(x)=\left\{\begin{array}{cc}
+1\textbf{,  } &\for x>0\\
+0\textbf{,  } &\for x=0\\
+-1\textbf{,  } &\for x<0\\
+\end{array}
+\right.
+\end{equation}
+
 一般来说，$C_{0}$直接由先验知识$\Theta$给出一个区间范围。在时刻$k$，由方程\eqref{eq.CkIk}得到信息浓缩集合（参数集）为
 \begin{equation}%
 \label{eq.Ck.d1}

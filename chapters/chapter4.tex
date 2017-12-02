@@ -4,20 +4,20 @@
 %% last update: Nov 8th, 2017
 %%==================================================
 \chapter{离散时间半参数自适应控制}\label{chap:4}
-自适应控制中的的辨识是为了控制问题，上一章设计了二维情形下的信息浓缩估计算法去辨识线性部分的未知参数。本章将在第三章的基础上设计非参数部分的估计算法，主要借助于一种机器学习算法，然后根据两部分的估计结果去设计自适应控制律在去解决随动控制问题。
+自适应控制中的辨识是为了控制问题，上一章设计了二维情形下的信息浓缩估计算法去辨识线性部分的未知参数。本章将在第三章的基础上设计非参数部分的估计算法，主要借助于一种机器学习算法，然后根据两部分不确定性的估计结果去设计自适应控制律在，解决随动控制问题。
 
 \section{问题描述}\label{sect:4.1}
 再次考虑第二章给出的半参数模型
 \begin{equation}%
 \label{eq:4.semi-u}
-y_{k+1} = \bm{\theta}^{T}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{\psi}_{k}})+\epsilon_{k+1}
+y_{k+1} = \bm{\theta}^{\tau}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{\psi}_{k}})+\epsilon_{k+1}
 \end{equation}
 其中，$\bm{\theta}$是未知参数向量，$f(\cdot)$是未知函数。同理，令
 \begin{equation}
 z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 \end{equation}
 
-针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\epsilon_{k+1}$的先验信息，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
+针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\epsilon_{k+1}$的先验信息，在$k$时刻，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
 
 本章针对系统\eqref{eq:4.semi-u}有如下先验信息：
 \begin{itemize}
@@ -25,10 +25,10 @@ z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 \begin{equation}\label{eq:4.ydB}
 |y_{k}^{*}|\leq B_{yd},\ \forall k\geq0.
 \end{equation}
-\item $\bm{\theta}$各分量是有界的，即$\underline{\theta}_{j}\leq\theta_{j}\leq\overline{\theta}_{j}$，其中$\underline{\theta}_{j}$和$\overline{\theta}_{j}$为已知的常数，$j=1,2,\ldots,p_{1}$.
+\item $\bm{\theta}$各分量是有界的，即$\underline{\theta}_{j}\leq\theta_{j}\leq\overline{\theta}_{j}$，其中$\underline{\theta}_{j}$和$\overline{\theta}_{j}$为已知的常数，$j=1,2,\ldots,d_{1}$.
 \item 噪声序列$\epsilon_{k}$的取值在一个已知的范围内，即
 \begin{equation}\label{eq:4.wB}
-\underline{\epsilon}\leq\epsilon_{k}\leq\overline{\epsilon}\,\ \forall k\geq0.
+\underline{\epsilon}\leq\epsilon_{k}\leq\overline{\epsilon},\ \forall k\geq0.
 \end{equation}
 \item 未知函数$f(\cdot)$的上下界受限于其他已知函数，即
 \begin{equation}\label{eq:4.fB}
@@ -38,18 +38,18 @@ z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 
 第三章已经给出了$\bm{\theta}$的估计算法，因此剩下的部分可以分为两个核心问题，一方面是设计$f(\cdot)$的估计算法，另一方面是设计控制输入$u_{k}$的表达式。假设第二章设计出的未知参数的估计值为$\hat{\bm{\theta}}_{k}$，下面需要设计出$\breve{z}_{k}$的表达式。因此，根据必然等价原理，设计出的控制输入的一般表达式为：
 \begin{equation}\label{eq:4.uk}
-u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{T}\cdot\hat{\bm{\theta}}_{k}-\breve{z}_{k}
+u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{\tau}\cdot\hat{\bm{\theta}}_{k}-\breve{z}_{k}
 \end{equation}
-非线性部分的辨识与控制器的设计是本章重点解决的问题。
+非线性部分的辨识与控制器的设计是本章要重点解决的问题。
 
 \section{非参数部分的估计}\label{sect:4.2}
 \subsection{最近邻估计}
-前面的章节用信息浓缩估计解决了参数不确定性的辨识问题，半参数自适应控制在提出来的时候，针对非参数部分使用的是最近邻估计。最近邻估计主要针对的是一维参数情形（$d_{1}=1$且$d_{2}=1$），即下面的一维半参数系统
+前面的章节用信息浓缩估计解决了参数不确定性的辨识问题，现有的半参数自适应控制方法针对非参数部分使用的是最近邻估计，其针对的主要是一维参数情形（$d_{1}=1$且$d_{2}=1$），即下面的一维半参数系统
 \begin{equation}%
 \label{eq:4.1ord}
 y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\epsilon_{k+1}
 \end{equation}
-这里，标量$\theta$是未知的，为参数不确定性部分，同样$f(\cdot)$是非参数不确定性部分，满足Lipschitz条件。最近邻估计不显示地估计$f(\cdot)$部分，而是直接估计
+这里，标量$\theta$是未知的，为系统的参数不确定性部分，同样$f(\cdot)$是非参数不确定性部分，满足Lipschitz条件。最近邻估计不显式地估计$f(\cdot)$部分，而是直接估计
 \begin{equation}\label{eq:4.nne.g}
 \eta_{k} = \theta y_{k}+f(y_{k})
 \end{equation}
@@ -59,7 +59,7 @@ y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\epsilon_{k+1}
 
 首先定义最近邻时刻为
 \begin{equation}\label{eq:4.it}
-i_k=\mathop{\arg \min}\limits_{i<k}|y_k-y_i|
+i_k\triangle\mathop{\arg \min}\limits_{i<k}|y_k-y_i|
 \end{equation}
 $i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等式成立
 \begin{equation*}
@@ -73,7 +73,7 @@ $i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等
 \begin{equation}\label{eq.4:g.est}
 \begin{array}{lll}
 \hat{\eta}_k&\triangleq\hat{\theta}_k(y_t-y_{i_k})+z_{i_k}
-&=\hat{\theta_k}(y_k-y_{i_k})+(y_{i_k+1}-u_{i_k})
+&=\hat{\theta}_{k}(y_k-y_{i_k})+(y_{i_k+1}-u_{i_k})
 \end{array}
 \end{equation}
 
@@ -115,23 +115,23 @@ u_{k}=\left\{
 下面首先阐述神经网络的基本数学模型。对于一个具有$N_{i}$个输入神经元、$N_{o}$个输出神经元以及$N_{h}$个隐含层神经元的单隐层前馈神经网络来说，如果其激活函数为$g(\cdot)$，并存在$N_{s}$个输入输出样本对
 $$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$$
 这里，输入向量为
-$$\bm{x}_{j}=[x_{j,1},x_{j,2},\ldots,x_{j,N_{i}}]^{T}\in \mathcal{R}^{N_{i}}$$
+$$\bm{x}_{j}=[x_{j,1},x_{j,2},\ldots,x_{j,N_{i}}]^{\tau}\in \mathcal{R}^{N_{i}}$$
 期望的输出向量为
-$$\bm{t}_{j}=[t_{j,1},t_{j,2},\ldots,t_{j,N_{o}}]^{T}\in \mathcal{R}^{N_{o}}$$
+$$\bm{t}_{j}=[t_{j,1},t_{j,2},\ldots,t_{j,N_{o}}]^{\tau}\in \mathcal{R}^{N_{o}}$$
 则对于任意输入向量$\bm{x}_{j}$，第$l$个（$l=1,2,\dots,N_{o}$）输出层神经元的输出为
 \begin{equation}%
 \label{eq:4.slfn.o}
 \begin{split}%
 o_{j,l}&=\sum_{i=1}^{N_{h}} \beta_{i,l} g(\bm{w}_{i},b_{i},\bm{x}_{j})\\
 &=\sum_{i=1}^{N_{h}} \beta_{i,l} h(\bm{x}_{i})\\
-&=\bm{h}(\bm{x}_{j})^{T}\cdot\bm{\beta}_{l}
+&=\bm{h}(\bm{x}_{j})^{\tau}\cdot\bm{\beta}_{l}
 \end{split}
 \end{equation}
 其中，$\bm{w}_{i}$和$b_{i}$分别是连接第$i$个隐层神经元与输入层的权重向量和阈值，$\bm{\beta}_{l}$是连接$l$个输出层神经元和隐含层的权重，$\bm{h}(\bm{x}_{j})$为隐含层的输出向量。
 
 一般来说，同一层的激活函数是一致的。如果第$i$个隐含神经元的激活函数$g(\cdot)$是加性的（addictive），比如Sigmoid型或者正弦型，则其输出为
 \begin{equation}%
-g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(\bm{w}_{i}^{T}\cdot\bm{x}_{j}+b_{i})
+g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(\bm{w}_{i}^{\tau}\cdot\bm{x}_{j}+b_{i})
 \end{equation}
 如果是径向基（Radias base function, RBF）网络，则
 \begin{equation}%
@@ -164,17 +164,17 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \end{equation}
 \begin{equation}\label{eq:4.nn.beta}
 \bm{\beta} = \begin{bmatrix}%
-&\bm{\beta}_{1}^{T}\\
+&\bm{\beta}_{1}^{\tau}\\
 &\vdots\\
-&\bm{\beta}_{N_{h}}^{T}
+&\bm{\beta}_{N_{h}}^{\tau}
 \end{bmatrix}_{N_{h}\times N_{o}}
 \end{equation}
 且
 \begin{equation}\label{eq:4.nn.T}
 \bm{T} = \begin{bmatrix}%
-&\bm{t}_{1}^{T}\\
+&\bm{t}_{1}^{\tau}\\
 &\vdots\\
-&\bm{t}_{N_{h}}^{T}
+&\bm{t}_{N_{h}}^{\tau}
 \end{bmatrix}_{N_{s}\times N_{o}}
 \end{equation}
 
@@ -247,7 +247,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 
 图\eqref{fig:elm}表示的是ELM在单隐层神经网络学习过程中的主要计算步骤。实际上，\eqref{eq:4.elm.beta}计算的是方程\eqref{eq:4.nn.HT}的最小二乘解，即
 \begin{equation}
-\bm{\beta}=(\bm{H}^{T}\bm{H})^{-1}\bm{H}^{T}\bm{T} 
+\bm{\beta}=(\bm{H}^{\tau}\bm{H})^{-1}\bm{H}^{\tau}\bm{T} 
 \end{equation}
 
 \begin{figure}
@@ -296,7 +296,7 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
 类似于RLS，OS-ELM和Re-OSELM等算法在系统建模与估计过程一般都是分为两个阶段。第一个阶段是初始化网络参数和输出权重$\bm{\beta}$估计值。对于Re-OSELM来说，需要一部分的离线输入输出数据用来完成初始化阶段，通过网络得出$\bm{H}_{0}$和$\bm{T}_{0}$之后，需要计算
 \begin{equation}
 \begin{split}%
-\bm{P}_{0}&=(\bm{H}_{0}^{T}\bm{H}_{0}+\lambda \bm{I}_{N_{h}})^{-1}\\
+\bm{P}_{0}&=(\bm{H}_{0}^{\tau}\bm{H}_{0}+\lambda \bm{I}_{N_{h}})^{-1}\\
 \bm{\beta}^{0}&=\bm{P}_{0}\bm{H}_{0}\bm{T}_{0}
 \end{split}
 \end{equation}
@@ -327,12 +327,12 @@ u_{k}=\frac{y_{k+1}^{*}-\hat{g}(\bm{x}_{k})}{\hat{\phi}(\bm{x}_{k})}
 z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 \end{equation}
 因此，神经网络的输入是$d_{2}=p_{2}+q_{2}$维向量
-$$\bm{\psi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{2}},u_{k-1},\dots,u_{k-q_{2}+1}]^{T}$$
+$$\bm{\psi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{2}},u_{k-1},\dots,u_{k-q_{2}+1}]^{\tau}$$
 $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因此网络的输出层只有一个神经元，输入层含$d_{2}$个神经元。
 
 本课题针对半参数系统在原始的ITF-OELM算法基础上做了几点变化。首先是估计的非线性函数只有一个，其次是在学习机制的不同。训练网络采用的输入数据$\bm{\psi}_{k}$直接来源于输入和观测到的历史输出数据，然而输出样本数据为
 \begin{equation}\label{eq:4.hatz}
-\hat{z}_{k-1}=y_{k}-\phi_{k}^{T}\hat{\theta}_{k-1}-u_{k-1}
+\hat{z}_{k-1}=y_{k}-\phi_{k}^{\tau}\hat{\theta}_{k-1}-u_{k-1}
 \end{equation}
 这个非线性估计部分是除去参数估计之后的剩余部分。用单隐层网络加上ELM学习算法得到的估计值是
 \begin{equation}\label{eq:4.z.breave}
@@ -364,7 +364,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \item 设置$k=0$，系统的初始状态为
 \begin{equation*}
 \begin{split}%
-\phi_{0}&=[y_{0},\ y_{-1}]^{T}\\
+\phi_{0}&=[y_{0},\ y_{-1}]^{\tau}\\
 \psi_{0}&=[y_{0},\dots,,y_{-p_{2}},u_{-1},\dots,u_{-q_{2}+1}]
 \end{split}
 \end{equation*}
@@ -399,16 +399,16 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 %2.c
 \item 计算$\sigma_{k}$，如果$Flag=0\bigwedge\sigma_{k}(1)\leq\delta\bigwedge\sigma_{n_{k}}(2)\leq\delta$ 那么设置$\gamma=1$与$Flag=1$。
 %2.d
-\item 设置$\hat{z}_{k-1}=y_{k}-\phi_{k-1}^{T}\hat{\bm{\theta}}_{k}-u_{k-1}$.
+\item 设置$\hat{z}_{k-1}=y_{k}-\phi_{k-1}^{\tau}\hat{\bm{\theta}}_{k}-u_{k-1}$.
 %2.e
 \item 如果$\gamma=1$那么执行(i); 否则，执行(ii).
 \begin{enumerate}%
 \item Updating：将$(\bm{\psi}_{k-1},\hat{z}_{k-1})$作为SLFN的输入输出样本数据，计算网络的隐含层输出$H_{k-1}$，并使用下面的等式计算矩阵$P_{k}$和隐含层到输出层的权重
 \begin{equation}\label{eq.elmk}
 \begin{split}%
-P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{T}(\rho\\
-&+H_{k-1}P_{k-1}H_{k-1}^{T})^{-1}H_{k-1}P_{k-1}) \\
-\beta^{k}=&\beta^{k-1} + P_{k-1}H_{k-1}^{T}(\hat{z}_{k-1}-H_{k-1}\beta^{k-1})
+P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{\tau}(\rho\\
+&+H_{k-1}P_{k-1}H_{k-1}^{\tau})^{-1}H_{k-1}P_{k-1}) \\
+\beta^{k}=&\beta^{k-1} + P_{k-1}H_{k-1}^{\tau}(\hat{z}_{k-1}-H_{k-1}\beta^{k-1})
 \end{split}
 \end{equation}
 \item Relearning：执行在初始化阶段的步骤1-(c),1-(d),1-(e).
@@ -419,7 +419,7 @@ P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{T}(\rho\\
 \end{equation}
 \item 结合参数和非参数两部分的估计，根据必然等价原理设计控制输入为
 \begin{equation}\label{eq.4:u}
-u_{k}=y^{*}_{k+1}-\phi_{k}^{T}\hat{\bm{\theta}}_{k}-\breve{z}_{k}
+u_{k}=y^{*}_{k+1}-\phi_{k}^{\tau}\hat{\bm{\theta}}_{k}-\breve{z}_{k}
 \end{equation}
 \item 设置$k=k+1$，然后转到Step 2(a).
 \end{enumerate}
@@ -435,9 +435,9 @@ e_{k+1} = y_{k+1} - y^{*}_{k+1}.
 \begin{split}%
 e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
 & = y_{k+1} - \hat{y}_{k+1} + \hat{y}_{k+1} - y^{*}_{k+1}\\
-& = (y_{k+1} - \phi_{k}^{T}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )\\
-& + (\phi_{k}^{T}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
-& = \phi_{k}\theta_{k} + z_{k} - \phi_{k}^{T}\hat{\theta}_{k} - \breve{z}_{k}\\
+& = (y_{k+1} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )\\
+& + (\phi_{k}^{\tau}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
+& = \phi_{k}\theta_{k} + z_{k} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k}\\
 & = \phi_{k}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})\\
 & = \phi_{k}\tilde{\bm{\theta}}_{k}+\tilde{z}_{k}
 \end{split}
