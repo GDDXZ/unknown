@@ -59,7 +59,7 @@ y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\epsilon_{k+1}
 
 首先定义最近邻时刻为
 \begin{equation}\label{eq:4.it}
-i_k\triangle\mathop{\arg \min}\limits_{i<k}|y_k-y_i|
+i_k\triangleq\mathop{\arg \min}\limits_{i<k}|y_k-y_i|
 \end{equation}
 $i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等式成立
 \begin{equation*}
@@ -156,9 +156,9 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 \begin{split}
 &\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}};\bm{x}_{1},\dots,\bm{x}_{N_{s}})=\\
 &\begin{bmatrix}
-&h(\bm{w}_{1},b_{1},\bm{x}_{1}) &\cdots &h(\bm{w}_{N_{s}},b_{N_{s}},\bm{x}_{N_{s}})\\
+&h(\bm{w}_{1},b_{1},\bm{x}_{1}) &\cdots &h(\bm{w}_{N_{b}},b_{N_{h}},\bm{x}_{N_{1}})\\
 &\vdots &\cdots & \vdots\\
-&h(\bm{w}_{1},b_{1},\bm{x}_{N_{s}}) &\cdots &h(\bm{w}_{N_{s}},b_{N_{s}},\bm{x}_{N_{s}})
+&h(\bm{w}_{1},b_{1},\bm{x}_{N_{s}}) &\cdots &h(\bm{w}_{N_{b}},b_{N_{h}},\bm{x}_{N_{s}})
 \end{bmatrix}_{N_{s}\times N_{h}}
 \end{split}
 \end{equation}
@@ -185,9 +185,9 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 &\min_{\hat{\bm{w}}_{i},\hat{b}_{i},\hat{\bm{\beta}}}\|\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}})-\bm{T}\|
 \end{split}
 \end{equation}
-成立，等价于最小化基于累计误差的损失函数
+成立，等价于最小化下面这个基于累计误差的损失函数
 \begin{equation}\label{eq:4.nn.cost}
-E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
+E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}.
 \end{equation}
 
 多层网络的学习能力依赖于强大的学习算法，误差反向传播（error BackPropagation, BP）是一种十分经典的代表。迄今为止，现实中的神经网络都是使用BP算法进行训练，不仅仅局限于多层前馈神经网络，还适用于递归神经网络等其它类型。BP算法是一种基于梯度下降（gradient-descent-based）的学习算法。将需要调整的权重$\bm{w}_{j}$和$\bm{\beta}$以及阈值$b_{j}$等网络参数，整体记作向量$\bm{W}$，则BP算法按照下面的式子调整$\bm{W}$:
@@ -196,7 +196,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 \end{equation}
 其中，$\eta$是学习速率。
 
-\begin{algo}[htp]
+\begin{algo}
 \caption{$\mathbf{BP}$学习算法的主要流程}
 \label{alg.bp}
 \begin{algorithmic}%
@@ -208,7 +208,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
   \STATE 根据输入样本和当前参数计算所有样本的输出结果；
   \STATE 计算输出层的累计误差；
   \STATE 将误差逆向传递至隐层神经元，根据隐层神经元的误差来对连接权重和阈值进行调整；
-  \STATE 根据\eqref{eq:4.bp.W}更新$\bm{W}$；
+  \STATE 根据方程\eqref{eq:4.bp.W}更新$\bm{W}$；
   \STATE 判断累积误差是否达到停止条件，如果达到，则退出当前循环；否则，继续当前迭代过程；
 \ENDFOR
 \ENSURE 网络参数向量$\bm{W}$确定的前馈型神经网络\\
@@ -235,7 +235,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 \begin{algorithmic}%
 \REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$\\
 \STATE Step1: 随机初始化输入权重$\bm{w}_{i}$和阈值$b_{i}$参数
-\STATE Step2: 计算隐含层输出矩阵$\bm{H}$，见表达式\eqref{eq.4.nn.H}
+\STATE Step2: 计算隐含层输出矩阵$\bm{H}$，见表达式\eqref{eq:4.nn.H}
 \STATE Step3: 计算输出层权重向量$\bm{\beta}$，根据如下表达式
 \begin{equation}\label{eq:4.elm.beta}
 \bm{\beta}=\bm{H}^{\dag}\bm{T}
@@ -245,7 +245,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 \end{algorithmic}
 \end{algo}
 
-图\eqref{fig:elm}表示的是ELM在单隐层神经网络学习过程中的主要计算步骤。实际上，\eqref{eq:4.elm.beta}计算的是方程\eqref{eq:4.nn.HT}的最小二乘解，即
+图\eqref{fig:elm}表示的是ELM在单隐层神经网络学习过程中的主要计算步骤。实际上，\eqref{eq:4.elm.beta}计算的是方程\eqref{eq:4.nn.HT}的最小二乘解（通常也是最小范数解），即
 \begin{equation}
 \bm{\beta}=(\bm{H}^{\tau}\bm{H})^{-1}\bm{H}^{\tau}\bm{T} 
 \end{equation}
@@ -260,8 +260,8 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}
 
 OS-ELM的推导过程不再详细介绍，和RLS类似。OS-ELM对于控制系统的辨识十分有用，因为控制系统的数据大多是实时产生的，需要在线辨识。然而OS-ELM和批处理形式最后的效果是一致的，只是中间过程不一样，并没有对网络结构和目标函数进行优化。基本ELM优化的仅仅是经验损失风险，目标函数见\eqref{eq:4.nn.cost}，因此ELM和OS-ELM都可能存在泛化能力不足和过拟合的现象。为了解决这个问题，相关学者\upcite{Escandell2011,HuynhWon2011}提出了正则化ELM（简称Re-ELM）和正则化OS-ELM（简称ReOS-ELM）。
 
-人工智能的发展一直推动着神经网络的研究，特别是2012年之后，深度学习（Deep Learning, DL）在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分的深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。针对大数据的应用，超限学习机也有相关变体，如H-ELM（
-High-Performance Extreme Learning Machine）\upcite{AkusokBjork2015}与深度学习相比，超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。
+神经网络在人工智能领域一直发挥重大作用，而人工智能的发展也一直推动着神经网络的研究。为了更好地利用神经网络实现预测和分类，特别是2012年之后，深度学习（Deep Learning, DL），借助于大量数据的驱动，在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。针对大数据的应用，超限学习机也有相关变体，如H-ELM（
+High-Performance Extreme Learning Machine）\upcite{AkusokBjork2015}与深度学习相比。超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。可以看出，超限学习机不管是在在一般量级的数据样本和大数据学习应用领域都具有很大的潜力。
 \begin{table}
 \centering
 \caption{超限学习机与常见深度学习算法的性能比较}\label{tab:elm-dl}
@@ -280,16 +280,16 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
 \end{table}
 
 \subsection{ELM估计}
-基于机器学习的辨识与建模是数据驱动的，可以适用于线性和非线性系统，主要建立系统的输入输出模型。快速、高精度的特点使得ELM迅速称为系统与控制领域很好的建模、估计与预测算法。特别是经过优化，提高泛化等方面的性能的ELM变体算法，如Re-OSELM。不同于\eqref{eq:4.nn.cost}和\eqref{eq:4.nn.H-T}，ReOS-ELM最小化目标的损失函数是
+基于机器学习的辨识与建模是数据驱动的，可以适用于线性和非线性系统，主要建立系统的输入输出模型。快速、高精度的特点使得ELM迅速称为系统与控制领域很好的建模、估计与预测算法。特别是经过优化、提高泛化等方面性能的ELM变体算法，如Re-OSELM。不同于\eqref{eq:4.nn.cost}和\eqref{eq:4.nn.H-T}，ReOS-ELM最小化目标的损失函数是
 \begin{equation}\label{eq:4.re.cost}
-\|\bm{H}\bm{\beta}-T\|^{2}+\lambda\|\bm{\beta}\|^{2}
+\|\bm{H}\bm{\beta}-\bm{T}\|^{2}+\lambda\|\bm{\beta}\|^{2}
 \end{equation}
 正则化因子$\lambda$的引入提高了网络的泛化能力。图\eqref{fig.reoselm}展示了用Re-OSELM建立非线性模型的框图。
 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.6\textwidth ]{ch4-re-elm-c.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
-  \caption{Re-OSELM算法的建模框图}
+  \caption{Re-OSELM算法的建模示意框图}
   \label{fig.reoselm}
 \end{figure}
 
@@ -302,7 +302,7 @@ Stacked Denoising AutoEncodes(SDAE)	&98.72	&>17 hours\\
 \end{equation}
 这里，$\bm{I}_{N_{h}}$是$N_{h}\times N_{h}$的单位矩阵
 
-在Re-OSELM算法更新权重的过称中引入恰当的或者自适应的遗忘因子$\pho$可以使得算法能够应用到时变参数系统中。由于正则化因子$\lambda$的存在，即使不需要大于隐含层个数的样本数据用来初始化$\bm{\beta}^{0}$，初始小规模的训练集也是比不可少的。然而，在控制系统中，由于输出值跟实际输入密切相关，因此一定数量的离线输入输出数据一般情况下是难以获得的，这就限制了Re-OSELM在实际控制系统中的应用。
+在Re-OSELM算法更新权重的过称中引入恰当的或者自适应的遗忘因子$\rho$，可以使得算法能够应用到时变参数系统中。由于正则化因子$\lambda$的存在，即使不需要大于隐含层个数的样本数据用来初始化$\bm{\beta}^{0}$，初始小规模的训练集也是比不可少的。然而，在控制系统中，由于输出值跟实际输入密切相关，因此一定数量的离线输入输出数据一般情况下是难以获得的，这就限制了Re-OSELM在实际控制系统中的应用。
 
 ITF-OELM算法就是用来解决缺少离线初始化数问题而提出的。ITF-OELM算法主要针对下面的单输入单输出离散时间非线性系统
 \begin{equation}\label{eq:4.siso}
@@ -332,9 +332,9 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 
 本课题针对半参数系统在原始的ITF-OELM算法基础上做了几点变化。首先是估计的非线性函数只有一个，其次是在学习机制的不同。训练网络采用的输入数据$\bm{\psi}_{k}$直接来源于输入和观测到的历史输出数据，然而输出样本数据为
 \begin{equation}\label{eq:4.hatz}
-\hat{z}_{k-1}=y_{k}-\phi_{k}^{\tau}\hat{\theta}_{k-1}-u_{k-1}
+\hat{z}_{k-1}=y_{k}-\bm{\phi}_{k}^{\tau}\hat{\bm{\theta}}_{k-1}-u_{k-1}
 \end{equation}
-这个非线性估计部分是除去参数估计之后的剩余部分。用单隐层网络加上ELM学习算法得到的估计值是
+这个非线性估计部分是除去参数估计之后的剩余部分。用基于单隐层网络的ELM学习算法得到的估计值是
 \begin{equation}\label{eq:4.z.breave}
 \breve{z}_{k}=H_{k}\beta^{k}
 \end{equation}
@@ -347,7 +347,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.55\textwidth]{ch4-elm-use.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
-  \caption{半参数自适应控制系统中采用的单隐层前馈网络结构}
+  \caption{半参数自适应控制系统中采用的单隐层前馈网络结构和参数}
   \label{fig.elm.use}
 \end{figure}
 
@@ -369,7 +369,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \end{split}
 \end{equation*}
 \item 根据关于$\bm{\theta}$的先验信息可以得到初始的多边形为$\Gamma_{0}$（通常是四边形），以及初始的参数估计$\hat{\bm{\theta}}_{0}$.
-\item 定义SLFN网络的隐含层神经元个数为$N_{h}$，正则化因子为$\lambda$和遗忘因子为$\rho$.
+\item 定义SLFN网络的隐含层神经元个数$N_{h}$，正则化因子$\lambda$和遗忘因子$\rho$.
 \item 对于第$i$个隐层神经元，随机初始化网络参数$(a_{i},b_{i})$，$i=1,2,\ldots,N_{h}$.
 \item 设置$\beta^{0}$和$P_{0}$为
 \begin{equation}\label{eq.elm0}
@@ -435,8 +435,7 @@ e_{k+1} = y_{k+1} - y^{*}_{k+1}.
 \begin{split}%
 e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
 & = y_{k+1} - \hat{y}_{k+1} + \hat{y}_{k+1} - y^{*}_{k+1}\\
-& = (y_{k+1} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )\\
-& + (\phi_{k}^{\tau}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
+& = (y_{k+1} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )+(\phi_{k}^{\tau}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
 & = \phi_{k}\theta_{k} + z_{k} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k}\\
 & = \phi_{k}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})\\
 & = \phi_{k}\tilde{\bm{\theta}}_{k}+\tilde{z}_{k}
@@ -454,11 +453,11 @@ y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \epsi
 其中，系统的未知参数和未知函数设定为
 \begin{equation}
 \begin{array}{c}
-\theta_{1} = -1,\ \theta_{2} = 1\\
+\theta_{1} = -1\textbf{, }\theta_{2} = 1\\
 f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
 \end{array}
 \end{equation}
-同时，未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象是二维参数和二维非参数情形，即$p_{1}=2$同时$q_{2}=2$。系统可利用的先验信息在数学上描述为
+同时，未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象的参数部分是二维情形，非参数部分也是二维情形，即$p_{1}=2$同时$q_{2}=2$。系统可利用的先验信息在数学上描述为
 \begin{equation}\label{eq.4:aprior}
 \begin{split}
 &\underline{f}(\psi_{k})=-3,\ \overline{f}(\psi_{k})=4\\
@@ -481,11 +480,11 @@ L_{k}\triangleq\theta_{1}y_{k} + \theta_{2} y_{k-1}=y_{k+1}-u_{k}-\hat{z}_{RLS}
 RLS估计算法也包括两个过程，第一个是初始化过程确定初始值，即
 \begin{equation}\label{eq:4.rls.0}
 \begin{split}
-&\bm{\pi}_{0}=\alpha \bm{I}_{p_{1}}\\
-&\bm{\theta}^{0}=[0.1,\dots,0.1]
+&\bm{\pi}_{0}=\alpha \bm{I}_{d_{1}}\\
+&\bm{\theta}^{0}=[0.1,\dots,0.1]^{\tau}
 \end{split}
 \end{equation}
-$\alpha$一般取较大的数（$10^{4}$~$10^{8}$）。第二阶段是递推过程，每一步都会改变$\bm{\theta}$和$\bm{\pi}^{0}$的值。第$k$时刻的估计为
+$\alpha$一般取较大的数（$10^{4}$\~{}$10^{8}$）。第二阶段是递推过程，每一步都会改变$\bm{\theta}$和$\bm{\pi}^{0}$的值。第$k$时刻的估计为
 \begin{equation}\label{eq:4.rls.k}
 \begin{split}
 \hat{\bm{\theta}}_{k}&=\hat{\bm{\theta}}_{k-1}+ \zeta_{k} \bm{\pi}_{k-1} \bm{\phi}_{k} (L_{k}-\bm{\phi}_k^\tau \bm{\theta}_{k-1})\\
@@ -528,7 +527,7 @@ y_{k}^{*} = 1.5\sin(2\bm{\pi} k\times T_{s})
 	\label{fig.sim.str.sys}
 \end{figure}
 
-除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig.sim.elm.f}。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明了引入超限学习机这种机器学习算法大大较少系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.1毫秒以内，基本能够满足基于工业PC的控制系统对实时性的要求。网络学习过程并没有引入一般深度网络依赖的并行计算等复杂设计，有利于在工业嵌入式系统中实现。
+除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig.sim.elm.f}，选择了径向基函数作为激活函数，网络的隐含层个数在10到20之间。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明了引入超限学习机这种机器学习算法大大较少系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.05毫秒以内，如果系统经过裁剪和优化可进一步提高运算速度，基本能够满足基于工业PC的控制系统对实时性的要求。网络学习过程并没有引入一般深度网络依赖的并行计算等复杂设计，有利于在工业嵌入式系统中实现。
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.7\textwidth ]{ch4-sim-elm-f.png}\\
