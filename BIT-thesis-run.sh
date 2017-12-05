@@ -1,6 +1,6 @@
 #!/bin/sh
 
-BASE=demo
+BASE=main
 
 rm ${BASE}.pdf
 xelatex -no-pdf --interaction=nonstopmode ${BASE}
