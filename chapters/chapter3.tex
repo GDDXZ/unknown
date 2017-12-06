@@ -49,9 +49,7 @@ $$L_{c}=(\bm{\phi},\bm{\theta})$$
 $$\bm{\phi}^{\tau}=[\phi_{1},\phi_{2}]$$
 顶点$P_{n}$的坐标为
 $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
-分别对应于待估计参数向量$\bm{\theta}$的第一个分量和第二个分量。
-
-顶点$P_{n}$和直线$L$的位置关系可以由下面的不等式确定
+分别对应于待估计参数向量$\bm{\theta}$的第一个分量和第二个分量。顶点$P_{n}$和直线$L$的位置关系可以由下面的不等式确定
 \begin{equation}\label{eq.3.L.P}
 \phi_{1}X_{P_{n}}+\phi_{2}Y_{P_{n}}\leq v
 \end{equation}
@@ -101,7 +99,7 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \section{算法实现}\label{sect:3.3}
 \begin{figure}[!h]
  \centering
- \includegraphics[width=0.9\textwidth ]{ch3-lc-flow.pdf}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
+ \includegraphics[width=0.9\textwidth ]{ch3-lc-flow.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
  \caption{$\mathbf{AddLinear2D}$的算法流程图}
  \label{fig.3.ic.flow}
 \end{figure}
@@ -110,14 +108,15 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 需要遍历多边形的所有顶点与多边形的位置关系。可以用一个数组记录顶点$P_{n}$和约束$L_{c}$的位置关系，即
 \begin{equation}%
 \mathbf{Flag}(n)=\left\{
-\begin{aligned}%
-&1,\ P_{n}\in L_{c}\\
-&-1,\ P_{n}\in L_{c}
-\end{aligned}
+\begin{array}{ll}
+&1\textbf{,  }P_{n}\in L_{c}\\
+&-1\textbf{, }P_{n}\in L_{c}
+\end{array}
+\right.
 \end{equation}
 这里，$n=1,2,\ldots,N$。
 
-根据上节的位置关系结果，可以设计算法的流程图如图\ref{fig.3.ic.flow}所示。最后写出具体过程伪代码实现见算法\ref{alg.ic.2d}。
+根据上节的位置关系结果，设计算法的流程如图\ref{fig.3.ic.flow}所示。最后写出具体过程伪代码实现见算法\ref{alg.ic.2d}。
 \begin{algo}%
 \caption{$\mathbf{AddLinear2D}$}
 \label{alg.ic.2d}
