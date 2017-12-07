@@ -24,11 +24,11 @@ $d_{1}=2$时，用$\Gamma$和$\Gamma'$分别表示两个不同的多边形，其
 
 $d_{1}=2$时，关于未知参数$\bm{\theta}$的约束不等式为
 \begin{equation}\label{eq.3.L}
-\bm{\phi}^{\tau}\cdot\bm{\theta}\leq e
+\bm{\phi}^{\tau}\cdot\bm{\theta}\leq v
 \end{equation}
 这里$\bm{\phi}$和$\bm{\theta}$都是二维向量，$\bm{\phi}$和$e$都可以由输入输出组合得到，$\bm{\theta}$是这个不等式的未知变量。
 
-因此，变换$G(\Gamma,\bm{\phi},e)$可以记为映射
+因此，变换$G(\Gamma,\bm{\phi},v)$可以记为映射
 \begin{equation}%
 \mathbf{AddLinear2D}\colon \Gamma\rightarrow\Gamma'
 \end{equation}
@@ -109,8 +109,8 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \begin{equation}%
 \mathbf{Flag}(n)=\left\{
 \begin{array}{ll}
-&1\textbf{,  }P_{n}\in L_{c}\\
-&-1\textbf{, }P_{n}\in L_{c}
+&1\textbf{, for }P_{n}\in L_{c}\\
+&-1\textbf{, for }P_{n}\notin L_{c}
 \end{array}
 \right.
 \end{equation}
@@ -170,11 +170,11 @@ $$P_{n}\colon (X_{P_{n}},Y_{P_{n}})$$
 \end{algorithmic}
 \end{algo}
 
-算法\ref{alg.ic.2d}实现了第\ref{sect:3.1}中提到的信息浓缩估计的第一步。对于第二步，一般选择多边形$\Gamma'$的中心作为参数估计值$\hat{\bm{\theta}}$，即
+算法\ref{alg.ic.2d}实现了第\ref{sect:3.1}中提到的信息浓缩估计的第一步。对于第二步，一般选择多边形$\Gamma'$的中心作为参数估计值$\hat{\bm{\theta}}'$，即
 \begin{equation}\label{eq.3.theta}
 \begin{split}%
-&\hat{\theta}_{1}=\frac1N\sum_{n=1}^{N}X_{P'_{n}}\\
-&\hat{\theta}_{2}=\frac1N\sum_{n=1}^{N}Y_{P'_{n}}
+&\hat{\theta}_{1}'=\frac1N\sum_{n=1}^{N}X_{P'_{n}}\\
+&\hat{\theta}_{2}'=\frac1N\sum_{n=1}^{N}Y_{P'_{n}}
 \end{split}
 \end{equation}
 
@@ -199,7 +199,7 @@ y_{k+1}=\theta_{1}\cdot y_{k} +\theta_{2}\cdot y_{k-1}+u_{k}+\epsilon_{k+1}+\sin
 -1\leq\sin(\frac{k}2)\leq1
 \end{equation*}
 
-为了便于计算，令$u_{k}=0$。在本节中，为了更加符合实际情况，在计算时，将随机干扰和非线性的上下界范围扩大，分别取为
+为了便于计算，令$u_{k}=0$。在本节中，为了更加符合实际情况，在计算时，将随机干扰和非线性函数的上下界范围扩大，分别取为
 \begin{equation*}
 -1\leq\omega_{k}\leq2
 \end{equation*}
@@ -216,7 +216,7 @@ y_{k+1}=\theta_{1}\cdot y_{k} +\theta_{2}\cdot y_{k-1}+u_{k}+\epsilon_{k+1}+\sin
 \Theta=\{-1\leq\theta_{1}\leq1,\ -1\leq\theta_{2}\leq1\}
 \end{equation*}
 
-仿真到第$k=500$时，得到的多边形如图\ref{fig.3.poly}所示，分别以两个参数代表横纵坐标，红色圈点代表真实值$\bm{\theta}$在几何上的表示，星形点代表了估计值$\hat{\bm{\theta}}$在几何上的表示。画出整个仿真过程的参数估计曲线如图\ref{fig.3.theta.hat}所示。从这个图中可以看出，参数估计值接近真实值。
+仿真到第$k=500$时，得到的多边形如图\ref{fig.3.poly}所示，分别以两个参数代表横纵坐标，星形点*代表真实值$\bm{\theta}$在几何坐标轴上的表示，红色圈点代表了估计值$\hat{\bm{\theta}}$在几何坐标轴上的表示。画出整个仿真过程的参数估计曲线如图\ref{fig.3.theta.hat}所示。从这个图中可以看出，参数估计值接近真实值。
 \begin{figure}[!h]
 	\centering
 	\includegraphics[width=0.7\textwidth ]{ch3-2d-poly.png}\\	 % e.g.,[scale=0.75], [width=0.75\textwidth ]
@@ -244,16 +244,16 @@ y_{k+1}=\theta_{1}\cdot y_{k} +\theta_{2}\cdot y_{k-1}+u_{k}+\epsilon_{k+1}+\sin
 C_{\infty}=\bigcap\limits_{k=1}^{\infty} C_{k}\subseteq \hat{C}_{\infty}
 \end{equation}
 
-上面方程\eqref{eq.loose}意味着，Loose-IC在实施过程中不会丢弃任何可能的参数值。对于$d_{1}=2$这种二维情形，为了便于计算，一般选择顶点个数$N_{L}=3$或者$N_{L}=4$，分别如图\ref{fig.3.loose.3}和\ref{fig.3.loose.4}所示。从图中可以看出，顶点个数的减少和多边形的简化，意味者计算复杂度的降低，实现较好的优化效果。
+上面的方程\eqref{eq.loose}意味着，Loose-IC在实施过程中不会丢弃任何可能的参数值。对于$d_{1}=2$这种二维情形，为了便于计算，一般选择顶点个数$N_{L}=3$或者$N_{L}=4$，分别如图\ref{fig.3.loose.3}和\ref{fig.3.loose.4}所示。从图中可以看出，顶点个数的减少和多边形的简化，意味者计算复杂度的降低，实现较好的优化效果。
 
 \begin{figure}[!h]
 	\centering
-	\subfigure[用三角形近似多边形]{	 % Caption of subfigure in []
+	\subfigure[用三角形$Q_{1}Q_{2}P_{4}$近似多边形$P_{1}P_{2}P_{3}P_{4}P_{5}$]{	 % Caption of subfigure in []
 	\label{fig.3.loose.3}	 % Label of subfigure in {}
-	\includegraphics[width=0.7\textwidth ]{fig-loose-export.eps}}
-	\subfigure[用矩形近似多边形]{
+	\includegraphics[width=0.7\textwidth ]{ch3-fig-loose-export.eps}}
+	\subfigure[用由上下边界围成的矩形近似多边形$P_{1}P_{2}P_{3}P_{4}P_{5}$]{
 	\label{fig.3.loose.4}
-	\includegraphics[width=0.7\textwidth ]{fig-rect-export.eps}}
+	\includegraphics[width=0.7\textwidth ]{ch3-fig-rect-export.eps}}
 	\caption{$d_{1}=2$时Loose-IC的实现途径}	 % Caption of figure
 	\label{fig.3.loose}	 % Label of figure
 \end{figure}

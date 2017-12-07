@@ -296,7 +296,8 @@ footskip=0.7cm% 页脚 1.8cm %
 \newcommand\myBioarrow[2][]{\ExtendSymbol{\Leftarrow}{=}{\Rightarrow}{#1}{#2}}
 \newcommand\myLongEqual[2][]{\ExtendSymbol{=}{=}{=}{#1}{#2}}
 
-
+%\newtheorem{algo}{算法~}[chapter]
+%\renewcommand{\algorithmcfname}{算法}
 \theoremstyle{plain}
   \newtheorem{algo}{算法~}[chapter]
   \newtheorem{thm}{定理~}[chapter]
