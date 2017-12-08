@@ -78,8 +78,8 @@ d_{2}=p_{2}+q_{2}
 \item $f(x)=0$对于任意的自变量$x$，这意味着系统不存在任何未建模动态特性；
 \item $f(x)$的值受限于其他已知函数，即$\underline{f}(x)\leq f(x)\leq\overline{f}(x)$，其中$\underline{f}(x)$和$\overline{f}(x)$为已知函数；
 \item 未知函数$f(x)$和标称函数$f_{0}(x)$之间的距离在某一个已知范围内内，即$\|f(x)-f_{0}(x)\|\leq r_{f}$，这里$r_{f}\geq0$是一个已知的常数，这样函数$f_{0}(x)$可以认为是定义在赋范可测函数空间中的集合$\mathcal{F}$的中心；
-\item 未知函数的表达式有限可数，即$f(x)$属于某一个已知的函数集合，$f(x)\in\{f_{1}(x),f_{2}(x),f_{3}(x),\dots,\}$。
-\item 未知函数$f(x)$是满足Lipschitz连续的，即存在某个常数$L_{f}\geq0$，使得对于不同的变量$x_{1}$和$x_{2}，有不等式$$\|f(x_{1})-f(x_{2})\|\leq L\|x_{1}-x_{2}\|$成立；
+\item 未知函数的表达式有限可数，即$f(x)$属于某一个已知的函数集合，$f(x)\in\{f_{1}(x),f_{2}(x),f_{3}(x),\dots,f_{nx}\}$。
+\item 未知函数$f(x)$是满足Lipschitz连续的，即存在某个常数$L_{f}\geq0$，使得对于不同的变量$x_{1}$和$x_{2}$，有不等式$\|f(x_{1})-f(x_{2})\|\leq L\|x_{1}-x_{2}\|$成立；
 \item 未知函数$f(x)$是相对于自变量来说是单调递增（或者递减）的；
 \item 未知函数$f(x)$是凸函数（或者凹函数）;
 \item $\dots$
@@ -90,7 +90,7 @@ d_{2}=p_{2}+q_{2}
 \item $\epsilon_{k}=0$对于任意的$k\geq0$，这意味着系统不存在随机干扰；
 \item $\epsilon_{k}$的取值在一个已知的范围内，即上下界已知，$\underline{\epsilon}\leq\epsilon_{k}\leq\overline{\epsilon}$；
 \item $\epsilon_{k}$的取值受限于其他已知的干扰序列，即$\underline{\epsilon}_{k}\leq\epsilon_{k}\leq\overline{\epsilon}_{k}$；
-\item $\epsilon_{k}$的取值都来自于一个已知的集合，即$\epsilon_{k}\in\{epsilon__{1}, epsilon__{2},\ldots,epsilon__{N}\}$；
+\item $\epsilon_{k}$的取值都来自于一个已知的集合，即$\epsilon_{k}\in\{epsilon_{1}, epsilon_{2},\ldots,epsilon_{N}\}$;
 \item $\epsilon_{k}$的统计特性符合某种概率分布：例如$\epsilon_{k}$是高斯随机过程，则$E(\epsilon_{k})=0$，$E(\epsilon_{k}^{2})=\sigma^{2}$；又比如$\epsilon_{k}$的取值满足均匀分布，即$\epsilon_{k}\sim U(0,1)$；
 \item $\epsilon_{k}$是一个衰减的序列，如$\epsilon_{k}=\frac1{k^{2}}$；
 \item $\dots$
@@ -301,7 +301,7 @@ v_{k,2}&=-(y_{k}-u_{k-1}-\overline{z})
 	\label{fig.2d.export}
 \end{figure}
 
-可以看出，多边形的面积在原来的基础上缩小了，即参数的可行域减少了，参数不确定性随着也就减少了。不过图\ref{fig.2d.export}只是线性约束和多边形位置的一种情况，因为很可能直线$L$和多边形没有交点，那么经过这个时刻的信息浓缩后，参数集合不变。因此在设计算法实现时需要考虑周全，否则可能导致$C_{\infty}=\varnothing$的出现。
+可以看出，多边形的面积在原来的基础上缩小了，即参数的可行域减少了，参数不确定性随着也就减少了。不过图\ref{fig.2d.export}只是线性约束和多边形位置的一种情况，因为很可能直线$L$和多边形没有交点，那么经过这个时刻的信息浓缩后，参数集合不变。因此在设计算法实现时应该考虑多种情况，否则可能导致$C_{\infty}=\varnothing$的出现。
 
 $d_{1}>2$时高维情形的情况类似，只是多边形变成了多面体，直线变成了广义半平面，由于多维情形不容易形象描述，此处就不再一一画出图形说明。
 

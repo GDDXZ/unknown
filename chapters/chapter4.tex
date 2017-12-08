@@ -109,7 +109,7 @@ u_{k}=\left\{
 \subsection{神经网络}
 机器学习解决的问题从数学上主要分为分类和回归。其中分类处理的数据主要是离散型数据，回归解决的对象和思路跟控制中的估计、预测十分类似。而神经网络作为一种十分有效的回归与预测算法，在非线性辨识中应用十分广泛。神经网络主要由输入层、隐含层和输出层组成（最简单的神经网络可能没有隐含层），依据不同的激活函数或者不同的学习算法，种类十分丰富。
 
-本章以及本文主要讨论一种十分常见的单隐层前馈神经网络（Single hidden layer feedforwar network, SLFN），即具有一个输入层、一个隐含层以及一个输出层的前馈型神经网络。这是一种多层网络，其中输入层神经元接受外界输入，隐含层与输出层的神经元对信号进行加工，最终结果由输出层神经元输出。
+本章以及本文主要讨论一种十分常见的单隐层前馈神经网络（Single hidden layer feedforwar network, SLFN），即具有一个输入层、一个隐含层以及一个输出层的前馈型神经网络。这是一种多层神经网络，其中位于输入层的神经元接受外界输入，隐含层与输出层的神经元按照一定规则对数据进行处理，整个网络的最终结果由位于输出层的神经元输出。
 
 下面首先阐述神经网络的基本数学模型。对于一个具有$N_{i}$个输入神经元、$N_{o}$个输出神经元以及$N_{h}$个隐含层神经元的单隐层前馈神经网络来说，如果其激活函数为$g(\cdot)$，并存在$N_{s}$个输入输出样本对
 $$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$$
@@ -234,8 +234,8 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}.
 \begin{algorithmic}%
 \REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$\\
 \STATE Step1: 随机初始化输入权重$\bm{w}_{i}$和阈值$b_{i}$参数
-\STATE Step2: 计算隐含层输出矩阵$\bm{H}$，见表达式\eqref{eq:4.nn.H}
-\STATE Step3: 计算输出层权重向量$\bm{\beta}$，根据如下表达式
+\STATE Step2: 计算隐含层的输出矩阵$\bm{H}$，见表达式\eqref{eq:4.nn.H}
+\STATE Step3: 计算输出层的权重向量$\bm{\beta}$，根据如下表达式
 \begin{equation}\label{eq:4.elm.beta}
 \bm{\beta}=\bm{H}^{\dag}\bm{T}
 \end{equation}
@@ -494,7 +494,7 @@ $\alpha$取较大的数（一般为$10^{4}$到$10^{8}$之间）。第二阶段�
 方程\eqref{eq:4.zhatrls}到\eqref{eq:4.rls.k}就是本章对比仿真采用的RLS算法。
 
 \subsection{仿真结果}\label{sect:4.4.2}
-设定的期望跟踪信号为
+设定的期望跟踪信号\upcite{ZhouMaLiYang2017}为
 \begin{equation}\label{eq:4.sim.yd}
 y_{k}^{*} = 1.5\sin(2\bm{\pi} k\times T_{s})
 \end{equation}
