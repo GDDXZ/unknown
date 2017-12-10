@@ -12,12 +12,12 @@
 \label{eq:4.semi-u}
 y_{k+1} = \bm{\theta}^{\tau}\bm{\phi_{k}}+u_{k}+f(\bm{\bm{\psi}_{k}})+\epsilon_{k+1}
 \end{equation}
-其中，$\bm{\theta}$是未知参数向量，$f(\cdot)$是未知函数。同理，令
+其中，$\bm{\theta}$是未知参数向量，$f(\cdot)$是未知函数。令
 \begin{equation}
 z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 \end{equation}
 
-针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述是：给定关于$\bm{\theta}$，$f(\cdot)$和$\epsilon_{k+1}$的先验信息，在$k$时刻，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
+针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述：给定关于$\bm{\theta}$，$f(\cdot)$和$\epsilon_{k+1}$的先验信息，在$k$时刻，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
 
 本章针对系统\eqref{eq:4.semi-u}有如下先验信息：
 \begin{itemize}
@@ -38,7 +38,7 @@ z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 
 第三章已经给出了$\bm{\theta}$的估计算法，因此剩下的部分可以分为两个核心问题，一方面是设计$f(\cdot)$的估计算法，另一方面是设计控制输入$u_{k}$的表达式。假设第二章设计出的未知参数的估计值为$\hat{\bm{\theta}}_{k}$，下面需要设计出$\breve{z}_{k}$的表达式。因此，根据必然等价原理，设计出的控制输入的一般表达式为：
 \begin{equation}\label{eq:4.uk}
-u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{\tau}\cdot\hat{\bm{\theta}}_{k}-\breve{z}_{k}
+u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{\tau}\hat{\bm{\theta}}_{k}-\breve{z}_{k}
 \end{equation}
 非线性部分的辨识与控制器的设计是本章要重点解决的问题。
 
@@ -49,7 +49,7 @@ u_{k}^{*}=y_{k+1}^{*}-\bm{\phi_{k}}^{\tau}\cdot\hat{\bm{\theta}}_{k}-\breve{z}_{
 \label{eq:4.1ord}
 y_{k+1}=\theta y_{k}+u_{k}+f(y_{k})+\epsilon_{k+1}
 \end{equation}
-这里，标量$\theta$是未知的，为系统的参数不确定性部分，同样$f(\cdot)$是非参数不确定性部分，满足Lipschitz条件。最近邻估计不显式地估计$f(\cdot)$部分，而是直接估计
+这里，标量$\theta$是未知的，为系统的参数不确定性部分，同样$f(\cdot)$是非参数不确定性部分，满足Lipschitz条件。最近邻估计不直接地估计$f(\cdot)$部分，而是直接估计
 \begin{equation}\label{eq:4.nne.g}
 \eta_{k} = \theta y_{k}+f(y_{k})
 \end{equation}
@@ -85,8 +85,7 @@ $i_k$是历史输出值中和当前时刻最接近的时刻。那么有如下等
                 =\min(\underline{b}_{k-1}, y_k).
 \end{array} 
 \end{equation}
-
-最后基于设计出下面的控制律
+最后基于最近邻估计思想设计出下面的控制律
 \begin{equation}\label{eq:4.uk}
 u_{k}=\left\{
 \begin{array}{cc}
@@ -97,7 +96,7 @@ u_{k}=\left\{
 \end{equation}
 这里，$D$是一个合适的常数值。
 
-由此看出，最近邻估计可以比较准确地给出一维情形下非参数部分的估计，从而解决半参数系统的自适应控制问题。但是有一定的局限性，主要体现在：
+由此看出，最近邻估计可以比较准确地给出一维情形下非参数部分的估计，从而解决半参数系统的自适应控制问题。但是有一定的局限性，主要体现在如下：
 \begin{enumerate}
 \item 由于最近邻时刻$i_k$的计算需要遍历所有的历史值，因此，随着时间的增长，理论上需要无限的内存用来存储历史数据。这给实施带来了困难。
 \item 由于在计算$\hat{g}_k$时没有对干扰值作特别处理，因此适用于干扰值的有界范围比较小且变化比较慢的系统。
@@ -153,10 +152,10 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 其中，$\bm{H}$是隐含层的输出矩阵，具体为
 \begin{equation}\label{eq:4.nn.H}
 \begin{split}
-&\bm{H}(\bm{w}_{1},\dots,\bm{w}_{N_{h}};b_{1},\dots,b_{N_{h}};\bm{x}_{1},\dots,\bm{x}_{N_{s}})=\\
+&\bm{H}(\bm{w}_{1},\cdots,\bm{w}_{N_{h}};b_{1},\cdots,b_{N_{h}};\bm{x}_{1},\cdots,\bm{x}_{N_{s}})=\\
 &\begin{bmatrix}
 &h(\bm{w}_{1},b_{1},\bm{x}_{1}) &\cdots &h(\bm{w}_{N_{b}},b_{N_{h}},\bm{x}_{N_{1}})\\
-&\vdots &\cdots & \vdots\\
+&\vdots &\ddots & \vdots\\
 &h(\bm{w}_{1},b_{1},\bm{x}_{N_{s}}) &\cdots &h(\bm{w}_{N_{b}},b_{N_{h}},\bm{x}_{N_{s}})
 \end{bmatrix}_{N_{s}\times N_{h}}
 \end{split}
@@ -189,9 +188,9 @@ g(\bm{w}_{i},b_{i},\bm{x}_{j})=g(b_{i}\|\bm{x}_{j}-\bm{w}_{i}\|)
 E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}.
 \end{equation}
 
-多层网络的学习能力依赖于强大的学习算法，误差反向传播（error BackPropagation, BP）是一种十分经典的代表。迄今为止，现实中的神经网络都是使用BP算法进行训练，不仅仅局限于多层前馈神经网络，还适用于递归神经网络等其它类型。BP算法是一种基于梯度下降（gradient-descent-based）的学习算法。将需要调整的权重$\bm{w}_{j}$和$\bm{\beta}$以及阈值$b_{j}$等网络参数，整体记作向量$\bm{W}$，则BP算法按照下面的式子调整$\bm{W}$:
+多层网络的学习能力依赖于强大的学习算法，误差反向传播（Error back propagation, BP）是一种十分经典的代表。迄今为止，现实中的神经网络都是使用BP算法进行训练，不仅仅局限于多层前馈神经网络，还适用于递归神经网络等其它类型。BP算法是一种基于梯度下降（gradient-descent-based）的学习算法。将需要调整的权重$\bm{w}_{j}$和$\bm{\beta}$以及阈值$b_{j}$等网络参数，整体记作向量$\bm{W}$，则BP算法按照下面的式子调整$\bm{W}$:
 \begin{equation}\label{eq:4.bp.W}
-\bm{W}_{k} = \bm{W}_{k-1}-\eta\frac{\partial E(\bm{W})}{\bm{W}},
+\bm{W}_{k} = \bm{W}_{k-1}-\eta\frac{\partial E(\bm{W})}{\partial\bm{W}},
 \end{equation}
 其中，$\eta$是学习速率。
 
@@ -199,9 +198,7 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}.
 \caption{$\mathbf{BP}$学习算法的主要流程}
 \label{alg.bp}
 \begin{algorithmic}%
-\REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$；\\
-学习速率$\eta$；\\
-迭代次数上限$N_{max}$\\
+\REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$；学习速率$\eta$；迭代次数上限$N_{max}$.\\
 \STATE 初始化所有网络参数（随机选择，或者根据经验指定）
 \FOR{$m=1$ to $N_{max}$}
   \STATE 根据输入样本和当前参数计算所有样本的输出结果；
@@ -233,8 +230,8 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}.
 \label{alg.elm}
 \begin{algorithmic}%
 \REQUIRE 训练样本集$\{\bm{x}_{j},\bm{t}_{j}\},\ j=1,2,\ldots,N_{s}$\\
-\STATE Step1: 随机初始化输入权重$\bm{w}_{i}$和阈值$b_{i}$参数
-\STATE Step2: 计算隐含层的输出矩阵$\bm{H}$，见表达式\eqref{eq:4.nn.H}
+\STATE Step1: 随机初始化输入权重$\bm{w}_{i}$和阈值$b_{i}$参数；
+\STATE Step2: 计算隐含层的输出矩阵$\bm{H}$，见表达式\eqref{eq:4.nn.H}；
 \STATE Step3: 计算输出层的权重向量$\bm{\beta}$，根据如下表达式
 \begin{equation}\label{eq:4.elm.beta}
 \bm{\beta}=\bm{H}^{\dag}\bm{T}
@@ -259,8 +256,8 @@ E=\sum_{j=1}^{N_{s}}(\bm{h}(x_{j})\bm{\beta}-\bm{t}_{j})^{2}.
 
 OS-ELM的推导过程不再详细介绍，和RLS类似。OS-ELM对于控制系统的辨识十分有用，因为控制系统的数据大多是实时产生的，需要在线辨识。然而OS-ELM和批处理形式最后的效果是一致的，只是中间过程不一样，并没有对网络结构和目标函数进行优化。基本ELM优化的仅仅是经验损失风险，目标函数见\eqref{eq:4.nn.cost}，因此ELM和OS-ELM都可能存在泛化能力不足和过拟合的现象。为了解决这个问题，相关学者\upcite{Escandell2011,HuynhWon2011}提出了正则化ELM（简称Re-ELM）和正则化OS-ELM（简称ReOS-ELM）。
 
-神经网络在人工智能领域一直发挥重大作用，而人工智能的发展也一直推动着神经网络的研究。为了更好地利用神经网络实现预测和分类，特别是2012年之后，深度学习（Deep Learning, DL），借助于大量数据的驱动，在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分深度学习算法大部分是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。针对大数据的应用，超限学习机也有相关变体，如H-ELM（
-High-Performance Extreme Learning Machine）\upcite{AkusokBjork2015}与深度学习相比。超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。可以看出，超限学习机不管是在在一般量级的数据样本和大数据学习应用领域都具有很大的潜力。
+神经网络在人工智能领域一直发挥重大作用，而人工智能的发展也一直推动着神经网络的研究。为了更好地利用神经网络实现预测和分类，特别是2012年之后，深度学习（Deep learning, DL），借助于大量数据的驱动，在图像分类、语音识别、自然语言处理等应用领域中获得了巨大成功\upcite{ZhengChenZhang2014}。目前大部分深度学习算法都是基于神经网络建立。对于深度学习来说，隐含层的数量级为十几层到几百层不等，甚至上千层。深层网络结构和特征学习思想是深度学习的两大主要特点。针对大数据的应用，超限学习机也有相关变体，如H-ELM（
+High-performance extreme learning machine）\upcite{AkusokBjork2015}与深度学习相比。超限学习机在不丢失精度的条件下具有快速的优势，比较见表\ref{tab:elm-dl}所示。可以看出，超限学习机不管是在一般量级的数据样本还是在大数据学习应用领域都具有很大的潜力。
 \begin{table}
 \centering
 \caption{超限学习机与常见深度学习算法的性能比较}\label{tab:elm-dl}
@@ -299,15 +296,15 @@ Stacked Denoising AutoEncodes(SDAE)	&$98.72$	&>17 hours\\
 \bm{\beta}^{0}&=\bm{P}_{0}\bm{H}_{0}\bm{T}_{0}
 \end{split}
 \end{equation}
-这里，$\bm{I}_{N_{h}}$是$N_{h}\times N_{h}$的单位矩阵
+这里，$\bm{I}_{N_{h}}$是$N_{h}\times N_{h}$的单位矩阵。
 
 在Re-OSELM算法更新权重的过称中引入恰当的或者自适应的遗忘因子$\rho$，可以使得算法能够应用到时变参数系统中。由于正则化因子$\lambda$的存在，即使不需要大于隐含层个数的样本数据用来初始化$\bm{\beta}^{0}$，初始小规模的训练集也是比不可少的。然而，在控制系统中，由于输出值跟实际输入密切相关，因此一定数量的离线输入输出数据一般情况下是难以获得的，这就限制了Re-OSELM在实际控制系统中的应用。
 
-ITF-OELM算法就是用来解决缺少离线初始化数问题而提出的。ITF-OELM算法主要针对下面的单输入单输出离散时间非线性系统
+ITF-OELM（Initial-training-free online extreme learning machine）算法\upcite{GaoWongWong2016}就是用来解决缺少离线初始化数问题而提出的。ITF-OELM算法主要针对下面的单输入单输出离散时间非线性系统
 \begin{equation}\label{eq:4.siso}
 y_{k+1} = g(\bm{x}_{k})+\phi(\bm{x}_{k})u_{k}
 \end{equation}
-这里$\bm{x}_{k}$是由$\{u_{k},y_{k}\}$组成的回归向量，$g(\cdot)$和$\phi(\cdot)$是具有未知参数的未知非线性函数。用ITF-OELM算法分别估计$g(\cdot)$和$\phi(\cdot)$，得到$\hat{g}(\cdot)$和$\hat{\phi}(\cdot)$，那么基于ITF-OELM估计的自适应控制律为
+这里$\bm{x}_{k}$是由$\{u_{k},y_{k}\}$组成的回归向量，$g(\cdot)$和$\phi(\cdot)$是具有未知参数的未知非线性函数。用ITF-OELM算法分别估计$g(\cdot)$和$\phi(\cdot)$，得到其相应的估计值$\hat{g}(\cdot)$和$\hat{\phi}(\cdot)$，那么基于ITF-OELM估计的自适应控制律为
 \begin{equation}\label{eq:4.itf.u}
 u_{k}=\frac{y_{k+1}^{*}-\hat{g}(\bm{x}_{k})}{\hat{\phi}(\bm{x}_{k})} 
 \end{equation}
@@ -329,11 +326,11 @@ z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 $$\bm{\psi_{k}}=[y_{k},y_{k-1},\ldots,y_{k-p_{2}},u_{k-1},\dots,u_{k-q_{2}+1}]^{\tau}$$
 $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因此网络的输出层只有一个神经元，输入层含$d_{2}$个神经元。
 
-本课题针对半参数系统在原始的ITF-OELM算法基础上做了几点变化。首先是估计的非线性函数只有一个，其次是在学习机制的不同。训练网络采用的输入数据$\bm{\psi}_{k}$直接来源于输入和观测到的历史输出数据，然而输出样本数据为
+本课题针对半参数系统在原始的ITF-OELM算法基础上做了两点变化。一方面是估计的非线性函数只有一个，另一方面是在线学习机制的不同。训练网络采用的输入数据$\bm{\psi}_{k}$直接来源于输入和观测到的历史输出数据，然而输出样本数据为
 \begin{equation}\label{eq:4.hatz}
-\hat{z}_{k-1}=y_{k}-\bm{\phi}_{k}^{\tau}\hat{\bm{\theta}}_{k-1}-u_{k-1}
+\hat{z}_{k-1}=y_{k}-u_{k-1}-\bm{\phi}_{k}^{\tau}\hat{\bm{\theta}}_{k-1}
 \end{equation}
-这个非线性估计部分是除去参数估计之后的剩余部分。用基于单隐层网络的ELM学习算法得到的估计值是
+这个非线性估计部分是实际测量结果$y_{k}-u_{k-1}$除去参数估计之后的剩余部分。用基于单隐层网络的ELM学习算法得到的估计值是
 \begin{equation}\label{eq:4.z.breave}
 \breve{z}_{k}=H_{k}\beta^{k}
 \end{equation}
@@ -392,11 +389,11 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \item \textbf{自适应控制阶段}
 \begin{enumerate}%
 %2.a
-\item 获得系统在第$k$个时刻的输出值$y_{k}$，并利用第二章的公式\eqref{eq.fk}计算$v_{k,1}$和$v_{k,2}$.
+\item 获得系统在第$k$个时刻的输出值$y_{k}$，并利用第二章的公式\eqref{eq:2.v}计算$v_{k,1}$和$v_{k,2}$.
 %2.b
 \item 用第三章的公式得到当前的多边形区域$C_{k}$，并将$C_{k}$的中心作为当前参数估计值$\hat{\bm{\theta}}_{k}$.
 %2.c
-\item 计算$\sigma_{k}$，如果$Flag=0\bigwedge\sigma_{k}(1)\leq\delta\bigwedge\sigma_{n_{k}}(2)\leq\delta$ 那么设置$\gamma=1$与$Flag=1$。
+\item 计算$\sigma_{k}$，如果$Flag=0\bigwedge\sigma_{k}(1)\leq\delta\bigwedge\sigma_{n_{k}}(2)\leq\delta$ 那么设置$\gamma=1$与$Flag=1$.
 %2.d
 \item 设置$\hat{z}_{k-1}=y_{k}-\phi_{k-1}^{\tau}\hat{\bm{\theta}}_{k}-u_{k-1}$.
 %2.e
@@ -405,8 +402,7 @@ $d_{2}$的具体数值视实际被控对象而定。输出是标量$z_{k}$。因
 \item Updating：将$(\bm{\psi}_{k-1},\hat{z}_{k-1})$作为SLFN的输入输出样本数据，计算网络的隐含层输出$H_{k-1}$，并使用下面的等式计算矩阵$P_{k}$和隐含层到输出层的权重
 \begin{equation}\label{eq.elmk}
 \begin{split}%
-P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{\tau}(\rho\\
-&+H_{k-1}P_{k-1}H_{k-1}^{\tau})^{-1}H_{k-1}P_{k-1}) \\
+P_{k}=&\frac{1}{\rho}(P_{k-1}-P_{k-1}H_{k-1}^{\tau}(\rho+H_{k-1}P_{k-1}H_{k-1}^{\tau})^{-1}H_{k-1}P_{k-1})\\
 \beta^{k}=&\beta^{k-1} + P_{k-1}H_{k-1}^{\tau}(\hat{z}_{k-1}-H_{k-1}\beta^{k-1})
 \end{split}
 \end{equation}
@@ -435,9 +431,9 @@ e_{k+1} = y_{k+1} - y^{*}_{k+1}.
 e_{k+1} & = y_{k+1} - y^{*}_{k+1}\\
 & = y_{k+1} - \hat{y}_{k+1} + \hat{y}_{k+1} - y^{*}_{k+1}\\
 & = (y_{k+1} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k} - u_{k} )+(\phi_{k}^{\tau}\hat{\theta}_{k} + \breve{z}_{k} + u_{k}  - y^{*}_{k+1})\\
-& = \phi_{k}\theta_{k} + z_{k} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k}\\
-& = \phi_{k}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})\\
-& = \phi_{k}\tilde{\bm{\theta}}_{k}+\tilde{z}_{k}
+& = \phi_{k}^{\tau}\theta_{k} + z_{k} - \phi_{k}^{\tau}\hat{\theta}_{k} - \breve{z}_{k}\\
+& = \phi_{k}^{\tau}(\theta_{k} - \hat{\theta}_{k}) + (z_{k} - \breve{z}_{k})\\
+& = \phi_{k}^{\tau}\tilde{\bm{\theta}}_{k}+\tilde{z}_{k}
 \end{split}
 \end{equation}
 从上面的方程\eqref{eq:4.stab}可以看出，如果参数部分和非参数部分的估计误差$\tilde{\bm{\theta}}_{k}$和$\tilde{z}_{k}$收敛到零，那么跟踪误差$e_{k+1}$也收敛到零。前面一章设计的信息浓缩估计可以保证未知参数估计收敛到零，并且本章的ELM估计非参数部分也可以保证收敛性，因此，本章设计的半参数自适应控制器可以保证渐进稳定性。
@@ -456,7 +452,7 @@ y_{k+1} = \theta_{1}y_{k} + \theta_{2}y_{k-1} + u_{k} + f(y_{k},y_{k-1}) + \epsi
 f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
 \end{array}
 \end{equation}
-同时，未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象的参数部分是二维情形，非参数部分也是二维情形，即$p_{1}=2$同时$q_{2}=2$。系统可利用的先验信息在数学上描述为
+同时，未知的噪声序列是独立同分布（i.i.d）的随机有界均匀分布，取自$U(-0.1,0.1)$。该被控对象的参数部分是二维情形，非参数部分也是二维情形，即$p_{1}=2$且$q_{2}=2$。系统可利用的先验信息在数学上描述为
 \begin{equation}\label{eq.4:aprior}
 \begin{split}
 &\underline{f}(\psi_{k})=-3,\ \overline{f}(\psi_{k})=4\\
@@ -466,7 +462,7 @@ f(y_{k},y_{k-1}) = \sin(y_{k}^{2}) + \cos(y_{k-1})
 \end{split}
 \end{equation}
 
-为了更好的验证半参数自适应控制器的性能，本章选取了经典的自适应控制算法，即自校正控制器（STR）作为对比算法。自校正控制器（或者自校正调节器）采用最小二乘算法（RLS）估计未知参数。不过由于RLS针对的是线性系统，而本章要控制的对象是\eqref{eq:4.plant}是非线性的。对比仿真实验的唯一控制变量在于自适应控制算法，因此先验信息\eqref{eq.4:aprior}对于STR同样可以利用，需要对原生的RLS估计进行简单的改进，补偿掉非线性部分。
+为了更好的验证半参数自适应控制器的性能，本章选取了经典的自适应控制算法，即自校正控制器（STR）作为对比算法。自校正控制器（或者自校正调节器）采用递推最小二乘算法（RLS）估计未知参数。不过由于RLS针对的是线性系统，而本章要控制的对象是\eqref{eq:4.plant}是非线性的。对比仿真实验的唯一控制变量在于自适应控制算法，因此先验信息\eqref{eq.4:aprior}对于STR同样可以利用，需要对原生的RLS估计进行简单的改进，补偿掉非线性部分。
 
 对比方法RLS实际估计的线性部分为
 \begin{equation}\label{eq:4.zrls}
@@ -483,7 +479,7 @@ RLS估计算法也包括两个过程，第一个是初始化过程确定初始�
 &\bm{\theta}^{0}=[0.1,\dots,0.1]^{\tau}
 \end{split}
 \end{equation}
-$\alpha$取较大的数（一般为$10^{4}$到$10^{8}$之间）。第二阶段是递推过程，每一步都会改变$\bm{\theta}$和$\bm{\pi}^{0}$的值。第$k$时刻的估计为
+$\alpha$取较大的数（一般为$10^{4}$到$10^{8}$之间）。第二阶段是递推过程，每一步都会改变$\bm{\theta}$和$\bm{\pi}^{0}$的值。根据递推最小二乘算法，第$k$时刻的估计为
 \begin{equation}\label{eq:4.rls.k}
 \begin{split}
 \hat{\bm{\theta}}_{k}&=\hat{\bm{\theta}}_{k-1}+ \zeta_{k} \bm{\pi}_{k-1} \bm{\phi}_{k} (L_{k}-\bm{\phi}_k^\tau \bm{\theta}_{k-1})\\
@@ -526,13 +522,13 @@ y_{k}^{*} = 1.5\sin(2\bm{\pi} k\times T_{s})
 	\label{fig.sim.str.sys}
 \end{figure}
 
-除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig.sim.elm.f}，选择了径向基函数作为激活函数，网络的隐含层个数在10到20之间。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明了引入超限学习机这种机器学习算法大大较少系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.05毫秒以内，如果系统经过裁剪和优化可进一步提高运算速度，基本能够满足基于工业PC的控制系统对实时性的要求。网络学习过程并没有引入一般深度网络依赖的并行计算等复杂设计，有利于在工业嵌入式系统中实现。
+除了对系统参数不确定性的处理外，半参数自适应控制中用在线超限学习机估计非参数部分，估计结果如图\ref{fig:4.sim.elm.f}，选择了径向基函数作为激活函数，网络的隐含层个数在10到20之间。从图中可以，对非线性函数的逼近结果很好，导致对下个周期的非参数部分估计比较准确。这充分说明引入超限学习机这种机器学习算法之后大大减少了系统的非参数不确定性，从而能够计算出合适的控制输入，给到被控对象。另外，基于超限学习机的网络学习过程也没有影响控制的实时性，计算很快，在普通PC机上（实验计算机配置为Intel i5处理器，主频为2.3GHz）每个周期的估计时间在0.05毫秒以内，如果系统经过裁剪和优化可进一步提高运算速度，基本能够满足基于工业PC的控制系统对实时性的要求。网络学习过程并没有引入一般深度网络依赖的并行计算等复杂设计，有利于在工业嵌入式系统中实现。
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.7\textwidth ]{ch4-sim-elm-f.png}\\
 % e.g.,[scale=0.75], [width=0.75\textwidth ]
   \caption{半参数自适应控制中超限学习机对非参数部分的估计结果}
-  \label{fig.sim.elm.f}
+  \label{fig:4.sim.elm.f}
 \end{figure}
 
 \section{本章总结}\label{sect:4.5}
