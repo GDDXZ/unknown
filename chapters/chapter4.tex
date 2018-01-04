@@ -19,13 +19,13 @@ z_{k} = f(\bm{\psi}_{k}) + \epsilon_{k+1}
 
 针对系统\eqref{eq:4.semi-u}，自适应估计与控制问题的一般表述：给定关于$\bm{\theta}$，$f(\cdot)$和$\epsilon_{k+1}$的先验信息，在$k$时刻，如何根据实时产生的一系列输入输出数据$\{y_{k},u_{k};k=1,2,\ldots\}$，去估计未知参数$\bm{\theta}$和$z_{k}$？然后根据$\bm{\theta}$和$z_{k}$的估计（预测）值去设计合适的自适应控制输入$u_{k}$使得$k+1$时刻的输出$y_{k+1}$能跟踪上期望的输出$y_{k+1}^{*}$。
 
-本章针对系统\eqref{eq:4.semi-u}有如下先验信息：
+本章假设系统\eqref{eq:4.semi-u}有如下先验信息：
 \begin{itemize}
 \item 期望跟踪信号$\{y_{k}^{*}\}$是有界的，即存在有界正常数$B_{yd}$，使得
 \begin{equation}\label{eq:4.ydB}
 |y_{k}^{*}|\leq B_{yd},\ \forall k\geq0.
 \end{equation}
-\item $\bm{\theta}$各分量是有界的，即$\underline{\theta}_{j}\leq\theta_{j}\leq\overline{\theta}_{j}$，其中$\underline{\theta}_{j}$和$\overline{\theta}_{j}$为已知的常数，$j=1,2,\ldots,d_{1}$.
+参数\item $\bm{\theta}$各分量是有界的，即$\underline{\theta}_{j}\leq\theta_{j}\leq\overline{\theta}_{j}$，其中$\underline{\theta}_{j}$和$\overline{\theta}_{j}$为已知的常数，$j=1,2,\ldots,d_{1}$.
 \item 噪声序列$\epsilon_{k}$的取值在一个已知的范围内，即
 \begin{equation}\label{eq:4.wB}
 \underline{\epsilon}\leq\epsilon_{k}\leq\overline{\epsilon},\ \forall k\geq0.
